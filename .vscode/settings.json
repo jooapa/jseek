@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.atrc": "ini",
         "atomic": "cpp",
         "bit": "cpp",
         "cctype": "cpp",
@@ -52,6 +53,7 @@
         "xmemory": "cpp",
         "xstring": "cpp",
         "xtr1common": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "vector": "cpp"
     }
 }

@@ -1,11 +1,17 @@
 #include <iostream>
 #include "app.h"
-
-std::string Lighthouse::Test::test() {
-    return std::string("Hello, World!");
-}
+#include "ATRC.h"
 
 int main () {
-    std::cout << "ddd" << std::endl;
+    std::unique_ptr<ATRCFiledata> filedata = std::make_unique<ATRCFiledata>();
+
+    // Set some properties
+    filedata->Filename = "example.atrc";
+    filedata->Encoding = "utf-8";
+    filedata->AutoSave = true;
+
+    if (DoesExistVariable(filedata.get(), "reference")) {
+        std::cout << "Variable 'reference' exists." << std::endl;
+    }
     return 0;
 }

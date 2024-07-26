@@ -9,7 +9,8 @@ if "%1" == "" (
     echo d: Debug build
     echo --------[run]---------
     echo r: Run the executable
-    echo rb: Release build and run the executable
+    echo b: build
+    echo rb: build and run the executable
     echo ---------------------
     goto :eof
 )
@@ -31,6 +32,9 @@ if "%2" == "r" (
     gradlew %BUILD_CMD%
     if errorlevel 1 goto :eof
     "%EXECUTABLE_PATH%"
+) else if "%2" == "b" (
+    gradlew %BUILD_CMD%
+    if errorlevel 1 goto :eof
 ) else (
     echo Invalid run type: %2
     goto :eof

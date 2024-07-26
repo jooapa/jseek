@@ -1,0 +1,31 @@
+plugins {
+    id 'cpp-application'
+    id 'cpp-unit-test'
+}
+
+application {
+    targetMachines.add(machines.windows.x86_64)
+}
+
+def includePath = file('libs/include')
+
+tasks.withType(CppCompile) {
+    includes.from(includePath)
+}
+
+tasks.withType(LinkExecutable) {
+    // Ensure the correct architecture library is being linked
+    linkerArgs.add(file('libs/ATRC.lib').absolutePath)
+}
+
+tasks.register('copyDll', Copy) {
+    from file('libs/ATRC.dll')
+    into file("$buildDir/exe/main/release")
+    doLast {
+        println "Copied DLL from ${file('libs/ATRC.dll').absolutePath} to ${file("$buildDir/exe/main/release").absolutePath}"
+    }
+}
+
+tasks.named('assemble') {
+    dependsOn 'copyDll'
+}
