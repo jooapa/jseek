@@ -6,38 +6,39 @@
 #include <Ultralight/platform/Config.h>
 #include <windows.h>
 #include <string>
+#include <variant>
 
 #define WINDOW_WIDTH  650
 #define WINDOW_HEIGHT 300
 
-ultralight::RefPtr<Window> m_CreateWindow(App* app) {
-    auto monitor = app->main_monitor();
+int window_x, window_y;
+
+MyApp::MyApp() {
+    app_ = App::Create();
+
+    auto monitor = app_->main_monitor();
     int screen_width = monitor->width();
     int screen_height = monitor->height();
 
-    int window_x = (screen_width - WINDOW_WIDTH) / 2;
-    int window_y = (screen_height - WINDOW_HEIGHT) / 2;
+    window_x = (screen_width - WINDOW_WIDTH) / 2;
+    window_y = (screen_height - WINDOW_HEIGHT) / 2;
+    window_ = Window::Create(monitor, WINDOW_WIDTH, WINDOW_HEIGHT, false, kWindowFlags_Titled);
 
-    auto window = Window::Create(monitor, WINDOW_WIDTH, WINDOW_HEIGHT, false, kWindowFlags_Borderless);
+    // hnwd
+    HWND hwnd = static_cast<HWND>(window_->native_handle());
+    SetWindowPos(
+        hwnd, 
+        HWND_TOPMOST
+        , 0, 0, 0, 0,
+        SWP_NOMOVE | SWP_NOSIZE
+    );
 
-    HWND hwnd01 = static_cast<HWND>(window->native_handle());
-    SetWindowPos(hwnd01, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-
-    window->MoveTo(window_x, window_y - 160);
-    return window;
-}
-
-MyApp::MyApp() {
-    ///
-    /// Create our main App instance.
-    ///
-    app_ = App::Create();
-
-    window_ = m_CreateWindow(app_.get());
-
-    overlay_ = Overlay::Create(window_, 1, 1, 0, 0);
+    window_->MoveTo(window_x, window_y);
+    overlay_ = Overlay::Create(window_.get(), 1, 1, 0, 0);
     
     OnResize(window_.get(), window_->width(), window_->height());
+
+
 
     overlay_->view()->LoadURL("file:///app.html");
 
@@ -69,41 +70,68 @@ MyApp::MyApp() {
 MyApp::~MyApp() {
 }
 
+bool isOpen = true;
 void MyApp::Run() {
     app_->Run();
+    
 }
 
 void MyApp::OnUpdate() {
+    overlay_->view()->Focus();
+    overlay_->Focus();
+
     // detect keypresses
     if (GetAsyncKeyState(VK_ESCAPE)) {
         app_->Quit();
     }
 
     // if clicked off the window, close it
-    if (GetAsyncKeyState(VK_LBUTTON)) {
+    if (GetAsyncKeyState(VK_MBUTTON)
+    ) {
         POINT p;
         GetCursorPos(&p);
         if (p.x < window_->x() || p.x > window_->x() + window_->width() || p.y < window_->y() || p.y > window_->y() + window_->height()) {
-            window_->Close();
+            if (isOpen) {
+                isOpen = false;
+                window_->Hide();
+            }
         }
     }
 
     // if pause brak is pressed, show the window
-    if (GetAsyncKeyState(VK_PAUSE)) {
-        window_ = m_CreateWindow(app_.get());
+    if (GetAsyncKeyState(VK_INSERT)) {
+        // create new window
+        if (!isOpen) {
+            isOpen = true;
+            window_->Close();
+            
+            window_ = Window::Create(app_->main_monitor(), WINDOW_WIDTH, WINDOW_HEIGHT, false, kWindowFlags_Titled);
+            overlay_ = Overlay::Create(window_.get(), 1, 1, 0, 0);
+            OnResize(window_.get(), window_->width(), window_->height());
+            overlay_->view()->LoadURL("file:///app.html");
+            // app_->set_listener(this);
+            // window_->set_listener(this);
+            // overlay_->view()->set_load_listener(this);
+            // overlay_->view()->set_view_listener(this);
+
+            window_->MoveTo(window_x, window_y);
+            HWND hwnd = static_cast<HWND>(window_->native_handle());
+            // SetWindowPos(
+            //     hwnd,
+            //     HWND_TOPMOST
+            //     , 0, 0, 0, 0,
+            //     SWP_NOMOVE
+            // );
+
+            window_->Show();
+
+            EnableWindow(hwnd, true);
+            SetFocus(hwnd);
+
+            overlay_->view()->Focus();
+            overlay_->Focus();
+        }
     }
-
-    overlay_->view()->Focus();
-    overlay_->Focus();
-
-
-    // if (overlay_->view()->HasFocus()) {
-    //     // overlay_->view()->set_load_listener(this);
-    //     // overlay_->view()->set_view_listener(this);
-    //     // overlay_->view()->Focus();
-    //     overlay_->Focus();
-    // }
-
 }
 
 JSValueRef OnButtonClick(JSContextRef ctx, JSObjectRef function,
