@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.atrc": "ini",
+        "xiosbase": "cpp",
+        "sstream": "cpp"
+    }
+}

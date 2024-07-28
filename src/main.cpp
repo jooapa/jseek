@@ -1,8 +1,8 @@
 #include "Lighthouse.h"
 
 int main() {
-  MyApp app;
-  app.Run();
+    MyApp app;
+    app.Run();
 
-  return 0;
+    return 0;
 }
