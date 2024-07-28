@@ -1,0 +1,14 @@
+{
+  "name": "lighthouse",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "pray": "electron src/index.js"
+  },
+  "keywords": [],
+  "author": "Jooapa",
+  "devDependencies": {
+    "electron": "^31.3.0"
+  }
+}
