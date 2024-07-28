@@ -10,6 +10,22 @@
 #define WINDOW_WIDTH  650
 #define WINDOW_HEIGHT 300
 
+ultralight::RefPtr<Window> m_CreateWindow(App* app) {
+    auto monitor = app->main_monitor();
+    int screen_width = monitor->width();
+    int screen_height = monitor->height();
+
+    int window_x = (screen_width - WINDOW_WIDTH) / 2;
+    int window_y = (screen_height - WINDOW_HEIGHT) / 2;
+
+    auto window = Window::Create(monitor, WINDOW_WIDTH, WINDOW_HEIGHT, false, kWindowFlags_Borderless);
+
+    HWND hwnd01 = static_cast<HWND>(window->native_handle());
+    SetWindowPos(hwnd01, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+
+    window->MoveTo(window_x, window_y - 160);
+    return window;
+}
 
 MyApp::MyApp() {
     ///
@@ -17,28 +33,12 @@ MyApp::MyApp() {
     ///
     app_ = App::Create();
 
-    auto monitor = app_->main_monitor();
-    int screen_width = monitor->width();
-    int screen_height = monitor->height();
-
-    int window_x = (screen_width - WINDOW_WIDTH) / 2;
-    int window_y = (screen_height - WINDOW_HEIGHT) / 2;
-
-    // window_ = Window::Create(monitor, WINDOW_WIDTH, WINDOW_HEIGHT,
-    //     false, kWindowFlags_Borderless);
-    window_ = Window::Create(monitor, WINDOW_WIDTH, WINDOW_HEIGHT,
-        false, kWindowFlags_Borderless
-    );
-
-    HWND hwnd01 = static_cast<HWND>(window_->native_handle());
-    SetWindowPos(hwnd01, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    window_ = m_CreateWindow(app_.get());
 
     overlay_ = Overlay::Create(window_, 1, 1, 0, 0);
-    window_->MoveTo(window_x, window_y - 160);
     
     OnResize(window_.get(), window_->width(), window_->height());
 
-    
     overlay_->view()->LoadURL("file:///app.html");
 
     ///
@@ -84,17 +84,17 @@ void MyApp::OnUpdate() {
         POINT p;
         GetCursorPos(&p);
         if (p.x < window_->x() || p.x > window_->x() + window_->width() || p.y < window_->y() || p.y > window_->y() + window_->height()) {
-            // window_->Hide();
-            overlay_->Unfocus();  
+            window_->Close();
         }
     }
 
     // if pause brak is pressed, show the window
     if (GetAsyncKeyState(VK_PAUSE)) {
-        // window_->Show();
-        overlay_->Focus();
+        window_ = m_CreateWindow(app_.get());
     }
 
+    overlay_->view()->Focus();
+    overlay_->Focus();
 
 
     // if (overlay_->view()->HasFocus()) {
@@ -149,7 +149,7 @@ JSValueRef OnButtonClick(JSContextRef ctx, JSObjectRef function,
     }
 
 void MyApp::OnClose(ultralight::Window* window) {
-  app_->Quit();
+//   app_->Quit();
 }
 
 void MyApp::OnResize(ultralight::Window* window, uint32_t width, uint32_t height) {
