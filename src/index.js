@@ -12,7 +12,7 @@ const {
 } = require('./create');
 
 const {
-    search
+    trySearch,
 } = require('./actions');
 
 app.on('ready', createWindow);
@@ -30,12 +30,15 @@ app.on('activate', function () {
 });
 
 // Listen for events from the renderer process
-ipcMain.on('some-event', (event, arg) => {
-    console.log(arg);
+ipcMain.handle('search-query', async (event, query) => {
+    try {
+        if (query.length === 0) {
+            return '';
+        }
 
-    var output = search(arg)
-
-    event.reply('some-event-reply',
-        output
-    );
+        const result = await trySearch(query);
+        return "for: " + query + "\n" + result;
+    } catch (error) {
+        return { error: error.message };
+    }
 });

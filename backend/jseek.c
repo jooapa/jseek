@@ -26,7 +26,7 @@ int main(int argc,char **argv)
 	Everything_SetSearchW(searchQuery);
 	Everything_SetRequestFlags(EVERYTHING_REQUEST_FILE_NAME|EVERYTHING_REQUEST_PATH);
 	Everything_SetSort(EVERYTHING_SORT_DATE_MODIFIED_DESCENDING);
-	Everything_SetMax(50);
+	Everything_SetMax(1);
 	
 	// Execute the query.
 	Everything_Query(TRUE);

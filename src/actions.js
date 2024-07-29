@@ -1,23 +1,43 @@
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
 
-const illegal = [
-    "",
-    " ",
-    
-]
 function search(query) {
-    const command = `C:\\Users\\Jooapa\\Documents\\GitHub\\Lighthouse\\backend\\beacon.exe ${query}`;
+    const command = 'C:\\Users\\Jooapa\\Documents\\GitHub\\Lighthouse\\backend\\build\\jseek.exe '+ query;
+    
+    const jseekRun = spawn(command, { shell: true });
+    jseekRun.stdout.setEncoding('utf-8');
+    jseekRun.stderr.setEncoding('utf-8');
 
-    exec(command, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            return;
-        }
-        console.log(`stdout: ${stdout}`);
-        return stdout;
+    return new Promise((resolve, reject) => {
+        let result = '';
+        let error = '';
+        jseekRun.stdout.on('data', (data) => {
+            result += data;
+        });
+
+        jseekRun.stderr.on('data', (data) => {
+            error += data;
+        });
+
+        jseekRun.on('close', (code) => {
+            if (code === 0) {
+                resolve(result);
+            } else {
+                reject(new Error(error));
+            }
+        });
     });
 }
 
+async function trySearch(query) {
+    try {
+        const result = await search(query);
+        return result;
+    } catch (error) {
+        console.error(`Error occurred: '${error.message}' while searching for: '${query}'`);
+        throw error;
+    }
+}
+
 module.exports = {
-    search,
+    trySearch,
 };

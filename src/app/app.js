@@ -1,14 +1,17 @@
 const { ipcRenderer } = require('electron');
 
 
-addEventListener("input", (event) => {
-    const input = document.getElementById("input");
+let debounceTimeout;
 
-    if (input.value.length > 0) {
-        ipcRenderer.send('some-event', input.value);
-    } else {
-        document.getElementById("results").innerHTML = "";
-    }
+document.getElementById("input").addEventListener("input", (event) => {
+    const input = event.target;
+
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+        ipcRenderer.invoke('search-query', input.value).then((result) => {
+            document.getElementById("results").innerHTML = result;
+        });
+    }, 500);
 });
 
 // event listener for key press
@@ -24,7 +27,3 @@ document.addEventListener('DOMContentLoaded', function() {
 function Onload() {
     document.getElementById("input").focus();
 }
-
-ipcRenderer.on('some-event-reply', (event, arg) => {
-    document.getElementById("results").innerHTML = arg;
-});
