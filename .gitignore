@@ -53,3 +53,5 @@ coverage/
 # Build directories
 dist/
 build/
+
+*.exe

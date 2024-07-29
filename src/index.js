@@ -11,6 +11,9 @@ const {
     mainWindow,
 } = require('./create');
 
+const {
+    search
+} = require('./actions');
 
 app.on('ready', createWindow);
 
@@ -28,9 +31,11 @@ app.on('activate', function () {
 
 // Listen for events from the renderer process
 ipcMain.on('some-event', (event, arg) => {
-    console.log(arg); // Prints the argument sent from the renderer process
-    // Perform some action in the main process
+    console.log(arg);
+
+    var output = search(arg)
+
     event.reply('some-event-reply',
-        "Arg: " + arg
+        output
     );
 });
