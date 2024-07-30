@@ -14,8 +14,10 @@ document.getElementById("input").addEventListener("input", (event) => {
     clearTimeout(debounceTimeoutFirst);
     debounceTimeoutFirst = setTimeout(() => {
         if (input.value.length === 0) {
+            resetResults();
             return;
         }
+        document.getElementById("results").innerHTML = "Getting results...";
         ipcRenderer.invoke('search-query', "1 " + input.value).then((result) => {
             setResults(result);
         });
@@ -24,6 +26,7 @@ document.getElementById("input").addEventListener("input", (event) => {
     clearTimeout(debounceTimeoutSecond);
     debounceTimeoutSecond = setTimeout(() => {
         if (input.value.length === 0) {
+            resetResults();
             return;
         }
         ipcRenderer.invoke('search-query', "5 " + input.value).then((result) => {
@@ -34,6 +37,7 @@ document.getElementById("input").addEventListener("input", (event) => {
     clearTimeout(debounceTimeoutThird);
     debounceTimeoutThird = setTimeout(() => {
         if (input.value.length === 0) {
+            resetResults();
             return;
         }
         ipcRenderer.invoke('search-query', "10 " + input.value).then((result) => {
@@ -49,7 +53,6 @@ function isValidCharInput(input) {
 
 // event listener for key press
 document.addEventListener('keydown', function(event) {
-    maybeResetResults(event);
     const inputElem = document.getElementById("input");
 
     if (event.key === "ArrowDown") {
@@ -73,16 +76,13 @@ document.addEventListener('keydown', function(event) {
         if (blocks.length === 0) {
             return;
         }
-        const block = blocks[selectedResult];
-        // `<div class="block" data-type="${type}" data-path="${path}">
-        const path = block.getAttribute("data-path");
-        const type = block.getAttribute("data-type");
-        alert("Opening: " + path + " of type: " + type);
-        // openFile(path, type);
+        // simulate click
+        blocks[selectedResult].click();
     }
 
     if (event.key === "Tab") {
         inputElem.focus();
+        inputElem.setSelectionRange(0, inputElem.value.length);
         event.preventDefault();
     }
 
@@ -91,6 +91,8 @@ document.addEventListener('keydown', function(event) {
         selectedResult = 0;
         updateSelectedResult();
     }
+    
+    maybeResetResults(event);
 });
 
 function updateSelectedResult() {
@@ -109,14 +111,6 @@ function updateSelectedResult() {
     if (blocks.length > 0) {
         blocks[selectedResult].scrollIntoView({ behavior: "auto", block: "center" });
     }
-}
-
-function maybeResetResults(event) {
-    if (event.target.value.length === 0 && event.key === "Backspace") {
-        resetResults();
-        return true;
-    }
-    return false;
 }
 
 function maybeResetResults() {
@@ -142,21 +136,31 @@ function resetResults() {
 }
 
 function openFile(path, type) {
-    if (type === "folder") {
+    type = type.toLowerCase();
+    if (type === "folder" || type === "volume") {
         ipcRenderer.invoke('open-folder', path);
     } else if (type === "file") {
         ipcRenderer.invoke('open-file', path);
+    } else {
+        console.error("Unknown type: " + type);
     }
 }
 
 function moreResults() {
-    alert("More results");
+    // 50 more results
+    let moreResults = results.length + 50;
+    ipcRenderer.invoke('search-query', moreResults + " " + document.getElementById("input").value).then((result) => {
+        setResults(result);
+    });
 }
+
+ipcRenderer.on('start', (event, arg) => {
+    inputElem = document.getElementById("input");
+    inputElem.focus();
+    const length = inputElem.value.length;
+    inputElem.setSelectionRange(0, length);
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     Onload();
 });
-
-function Onload() {
-    document.getElementById("input").focus();
-}

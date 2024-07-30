@@ -1,11 +1,12 @@
 :root {
     --bg-color: #3d3d3d;
-    --text-color: #fff;
+    --text-color: #ffffff;
     --border-color: #747474;
     --shadow-color: rgba(0, 0, 0, 0.8);
     --placeholder-color: #2c2c2c;
     --hover-color: #ffffff;
     --path-text-color: #797979;
+    --highlight-color: #e2f6ff;
 }
 
 body {
@@ -109,6 +110,12 @@ body {
     margin: 0 0 0 10px;
     padding: 0;
     align-items: center
+}
+
+#results .block .info span.highlight {
+    font-weight: bold;
+    color: var(--highlight-color);
+    /* font-style: italic; */
 }
 
 #results .block .info p {

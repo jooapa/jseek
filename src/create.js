@@ -2,7 +2,8 @@ const {
     BrowserWindow, 
     app, 
     globalShortcut, 
-    screen, 
+    screen,
+    ipcMain,
 } = require('electron');
 
 let mainWindow;
@@ -41,6 +42,7 @@ function createWindow() {
     // Show window on Alt+Space
     globalShortcut.register('Alt+Space', () => {
         mainWindow.show();
+        mainWindow.webContents.send('start');
     });
 
     globalShortcut.register('Escape', () => {

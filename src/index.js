@@ -39,7 +39,7 @@ ipcMain.handle('search-query', async (event, query) => {
         }
 
         const result = await trySearch(query);
-        return makeReply(result);
+        return makeReply(result, query);
     } catch (error) {
         return { error: error.message };
     }
@@ -50,7 +50,7 @@ ipcMain.handle('open-file', (event, path) => {
     shell.openPath(path);
 });
 
-function makeReply(reply) {
+function makeReply(reply, originalQuery) {
     // <div class="block">
     //     <img src="image1.jpg">
     //     <div class="info">
@@ -59,7 +59,7 @@ function makeReply(reply) {
     //     </div>
     // </div>
     
-    /// Example reply: "C:\Users\Jooapa\Documents\GitHub\jammer\example\asd.jammer | asd.jammer | file"
+    /// Example reply: "C:\Users\Jooapa\Documents\GitHub\jammer\example\asd.jammer | asd.jammer | file\n"
     // split by ":" 
     
     let result = '';
@@ -70,15 +70,16 @@ function makeReply(reply) {
         if (file.length === 0) {
             return;
         }
-
+        file = file.substring(0, file.length - 1);
         let [path, name, type] = file.split('|');
-        // let betterPath = path.replace(/\\/g, '\\\\');
+
+        let betterPath = path.replace(/\\/g, '\\\\');
         result += 
-        `<div class="block" data-type="${type}" data-path="${path}">
+        `<div class="block" data-type="${type}" data-path="${path}" onclick="openFile('${betterPath}', '${type}')">
             <img src="image1.jpg">
             <div class="info">
-                <h2 class="name">${name}</h2>
-                <p class="path">${path}</p>
+                <h2 class="name">${highlightResults(name, originalQuery)}</h2>
+                <p class="path">${highlightResults(path, originalQuery)}</p>
             </div>
         </div>`;
     });
@@ -111,8 +112,25 @@ function makeReply(reply) {
 
 
 function highlightResults(input, highlight) {
-    // find highlight in input and wrap it in <span> tags
+    // find highlight in input and wrap it in <span class="highlight"> tags
     // return the modified input
 
+    // hightlight example: "num query going here"
+    // remove the number from the start
 
+    highlight = highlight.substring(highlight.indexOf(' ') + 1);
+
+    if (!input || !highlight) {
+        return input;
+    }
+
+    // Escape special characters in the highlight string to safely use it in regex
+    const escapeRegExp = (string) => {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    };
+
+    const escapedHighlight = escapeRegExp(highlight);
+    const regex = new RegExp(`(${escapedHighlight})`, 'gi');
+
+    return input.replace(regex, '<span class="highlight">$1</span>');
 }
