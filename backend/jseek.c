@@ -14,17 +14,17 @@ LPCWSTR charToLPCWSTR(const char* charArray)
 
 int main(int argc,char **argv)
 {
-	DWORD i;
-	
-	if(argc < 3)
-	{
-		printf("Usage: jseek [maxResults] [searchQuery...]\n");
-		return 1;
-	}
+    DWORD i;
+    
+    if(argc < 3)
+    {
+        printf("Usage: jseek [maxResults] [searchQuery...]\n");
+        return 1;
+    }
 
-	DWORD max_value = strtoul(argv[1], NULL, 10);
-
-	size_t argSearchStartIndex = 2;
+    DWORD max_value = strtoul(argv[1], NULL, 10);
+    
+    size_t argSearchStartIndex = 2;
     size_t totalLength = 0;
     for (i = argSearchStartIndex; i < argc; i++) {
         totalLength += strlen(argv[i]) + 1; // +1 for space or null terminator
@@ -42,31 +42,31 @@ int main(int argc,char **argv)
         }
     }
 
-	// printf("Searching for: '%s'\n", tmp_searchQuery);
+    // printf("Searching for: '%s'\n", tmp_searchQuery);
 
-	LPCWSTR searchQuery = charToLPCWSTR(tmp_searchQuery);
+    LPCWSTR searchQuery = charToLPCWSTR(tmp_searchQuery);
 
-	// Init Everything.
-	Everything_SetSearchW(searchQuery);
-	// request files and folders
-	Everything_SetRequestFlags(EVERYTHING_REQUEST_FILE_NAME|EVERYTHING_REQUEST_PATH|EVERYTHING_REQUEST_DATE_MODIFIED);
-	Everything_SetSort(EVERYTHING_SORT_DATE_MODIFIED_DESCENDING);
-	Everything_SetMax(max_value);
-	
-	// Execute the query.
-	Everything_Query(TRUE);
-	
+    // Init Everything.
+    Everything_SetSearchW(searchQuery);
+    // request files and folders
+    Everything_SetRequestFlags(EVERYTHING_REQUEST_FILE_NAME|EVERYTHING_REQUEST_PATH|EVERYTHING_REQUEST_DATE_MODIFIED);
+    Everything_SetSort(EVERYTHING_SORT_DATE_MODIFIED_DESCENDING);
+    Everything_SetMax(max_value);
+    
+    // Execute the query.
+    Everything_Query(TRUE);
+    
     // Display results.
-	for(i=0;i<Everything_GetNumResults();i++)
-	{
-		printf("%s\\%s | %s\n",
-			Everything_GetResultPath(i),
-			Everything_GetResultFileName(i), 
-			Everything_GetResultFileName(i)	
-		);
-	}
+    for(i=0;i<Everything_GetNumResults();i++)
+    {
+        printf("%s\\%s | %s\n",
+            Everything_GetResultPath(i),
+            Everything_GetResultFileName(i), 
+            Everything_GetResultFileName(i)	
+        );
+    }
     // Free the allocated memory
     free((void*)searchQuery);
-	
-	return 0;
+    
+    return 0;
 }
