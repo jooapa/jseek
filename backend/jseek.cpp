@@ -36,7 +36,19 @@ int main(int argc, char** argv) {
     Everything_Query(TRUE);
 
     for (DWORD i = 0; i < Everything_GetNumResults(); ++i) {
-        std::wcout << Everything_GetResultPath(i) << L"\\" << Everything_GetResultFileName(i) << L" | " << Everything_GetResultFileName(i) << L"\n";
+        // determine file type
+        std::wstring type;
+        if (Everything_IsFileResult(i)) {
+            type = L"File";
+        } else if (Everything_IsFolderResult(i)) {
+            type = L"Folder";
+        } else if (Everything_IsVolumeResult(i)) {
+            type = L"Volume";
+        } else {
+            type = L"Unknown";
+        }
+
+        std::wcout << Everything_GetResultPath(i) << L"\\" << Everything_GetResultFileName(i) << L"|" << Everything_GetResultFileName(i) << L"|" << type << L"\n";
     }
 
     return 0;
