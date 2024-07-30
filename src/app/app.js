@@ -14,25 +14,27 @@ document.getElementById("input").addEventListener("input", (event) => {
             return;
         }
         ipcRenderer.invoke('search-query', "1 " + input.value).then((result) => {
-            addResults(result);
+            setResults(result);
         });
     }, 100);
+
     clearTimeout(debounceTimeoutSecond);
     debounceTimeoutSecond = setTimeout(() => {
         if (input.value.length === 0) {
             return;
         }
         ipcRenderer.invoke('search-query', "5 " + input.value).then((result) => {
-            addResults(result);
+            setResults(result);
         });
     }, 1000);
+
     clearTimeout(debounceTimeoutThird);
     debounceTimeoutThird = setTimeout(() => {
         if (input.value.length === 0) {
             return;
         }
         ipcRenderer.invoke('search-query', "10 " + input.value).then((result) => {
-            addResults(result);
+            setResults(result);
         });
     }, 2000);
 });
@@ -58,9 +60,9 @@ function maybeResetResults() {
     return false;
 }
 
-function addResults(result) {
+function setResults(result) {
     if (!maybeResetResults()) {
-        document.getElementById("results").innerHTML += result;
+        document.getElementById("results").innerHTML = result;
     }
 }
 

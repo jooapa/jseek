@@ -20,7 +20,7 @@ if __name__ == "__main__":
         
     # check if the args are valid
     for arg in args:
-        if arg == '-c':
+        if arg == '-cpp':
             c_build = True
         if arg == '-js':
             run_electron = True
@@ -34,7 +34,7 @@ if __name__ == "__main__":
             shutil.copy("libs/Everything64.dll", "build/Everything64.dll")
         
         result = os.system("""
-            gcc -Iinclude -Llibs jseek.c -lEverything64 -o jseek
+            g++ -Iinclude -Llibs jseek.cpp -lEverything64 -o jseek
             """)
         
         if result != 0:
