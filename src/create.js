@@ -29,6 +29,7 @@ function createWindow() {
             nodeIntegration: true,
 			enableRemoteModule: true,
 			contextIsolation: false,
+            spellcheck: false,
             // devTools: false,
         }
 });

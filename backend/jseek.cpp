@@ -7,8 +7,22 @@
 #include <vector>
 #include <locale>
 #include <codecvt>
+#include <shlobj.h>
+#include <shlwapi.h>
 #include <stdexcept>
 #include "Everything.h"
+
+// Function to get the icon handle
+HICON GetFileIcon(const std::wstring& path) {
+    SHFILEINFO shFileInfo;
+    ZeroMemory(&shFileInfo, sizeof(SHFILEINFO));
+
+    // Get the icon handle
+    if (SHGetFileInfo(path.c_str(), 0, &shFileInfo, sizeof(SHFILEINFO), SHGFI_ICON | SHGFI_LARGEICON)) {
+        return shFileInfo.hIcon;
+    }
+    return nullptr;
+}
 
 std::wstring CharToLPCWSTR(const std::string& charArray) {
     try {
@@ -26,7 +40,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    DWORD max_value = std::stoul(argv[1]);
+    DWORD max_results = std::stoul(argv[1]);
 
     std::string tmp_searchQuery;
     for (int i = 2; i < argc; ++i) {
@@ -40,8 +54,9 @@ int main(int argc, char** argv) {
 
     Everything_SetSearchW(searchQuery.c_str());
     Everything_SetRequestFlags(EVERYTHING_REQUEST_FILE_NAME | EVERYTHING_REQUEST_PATH | EVERYTHING_REQUEST_DATE_MODIFIED);
+    // set the sort to sort by the best match
     Everything_SetSort(EVERYTHING_SORT_DATE_MODIFIED_DESCENDING);
-    Everything_SetMax(max_value);
+    Everything_SetMax(max_results);
 
     Everything_Query(TRUE);
 
@@ -66,6 +81,19 @@ int main(int argc, char** argv) {
             type = L"Volume";
         }
 
+        // get the icon handle
+        HICON icon = GetFileIcon(resultPath);
+
+        // get the icon index
+        int iconIndex = 0;
+        if (icon) {
+            iconIndex = LookupIconIdFromDirectoryEx((PBYTE)icon, TRUE, 0, 0, LR_DEFAULTCOLOR);
+        }
+
+        // free the icon handle
+        if (icon) {
+            DestroyIcon(icon);
+        }
 
         if (type == L"Volume") {
             std::wcout << resultFileName << L"|" << resultFileName << L"|";
@@ -73,7 +101,7 @@ int main(int argc, char** argv) {
             std::wcout << resultPath << L"\\" << resultFileName  << L"|" << resultFileName << L"|";
         }
 
-        std::wcout << type << L"\n";
+        std::wcout << type << L"|" << iconIndex << std::endl;
     }
 
     return 0;

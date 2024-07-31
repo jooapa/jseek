@@ -18,8 +18,20 @@ document.getElementById("input").addEventListener("input", (event) => {
             return;
         }
         gettingResultsLoading()
-        ipcRenderer.invoke('search-query', "1 " + input.value).then((result) => {
-            setResults(result);
+        ipcRenderer.invoke('search-query', '1 "' + input.value+'"').then((result) => {
+            console.log("What type: " + result[1]);
+            console.log("Result: " + result[0]);
+            // if (whatType === "No results") {
+            //     return;
+            // }
+            setResults(result[0]);
+            if (result[1] === "No results") {
+                clearTimeout(debounceTimeoutFirst);
+                clearTimeout(debounceTimeoutSecond);
+                clearTimeout(debounceTimeoutThird);
+                return;
+            }
+            
         });
     }, 100);
 
@@ -30,8 +42,8 @@ document.getElementById("input").addEventListener("input", (event) => {
             return;
         }
         gettingResultsLoading()
-        ipcRenderer.invoke('search-query', "5 " + input.value).then((result) => {
-            setResults(result);
+        ipcRenderer.invoke('search-query', '5 "' + input.value+'"').then((result) => {
+            setResults(result[0]);
         });
     }, 1000);
 
@@ -42,8 +54,8 @@ document.getElementById("input").addEventListener("input", (event) => {
             return;
         }
         gettingResultsLoading()
-        ipcRenderer.invoke('search-query', "10 " + input.value).then((result) => {
-            setResults(result);
+        ipcRenderer.invoke('search-query', '10 "' + input.value+'"').then((result) => {
+            setResults(result[0]);
         });
     }, 2000);
 });
@@ -61,6 +73,13 @@ function gettingResultsLoading() {
     if (blocks.length === 0) {
         noBLocks = true;
     }
+
+    // if already exists, remove it
+    const existingLoadingDiv = results.getElementsByClassName("getting");
+    if (existingLoadingDiv.length > 0) {
+        existingLoadingDiv[0].remove();
+    }
+
     const lastBlock = blocks[blocks.length - 1];
     const loadingDiv = document.createElement("div");
     loadingDiv.classList.add("getting");
@@ -73,9 +92,18 @@ function gettingResultsLoading() {
     // scroll to the bottom
     // results.scrollTop = results.scrollHeight;
 }
-
+function isValidnonModidyInputchar(input) {
+        if (input === "ArrowLeft") return true;
+    if (input === "ArrowRight") return true;
+}
 function isValidCharInput(input) {
-    // check if the input the normal key
+    console.log("Input: " + input);
+    if (input === "Backspace") return true;
+    if (input === " ") return true;
+
+    const specialChars = ['"', "'", '?', '!', '#', '¤', '%', '&', '/', '(', ')', '=', '?', '*', '+', '§', '£', '€', '{', '[', ']', '}', '\\', '|', '@', '£', '€', '½', '¼', '¾', '¬', '¦', '´', '`', '¨', '^', '~', '<', '>', ',', ';', ':', '.', '-'];
+    if (specialChars.includes(input)) return true;
+
     return input.length === 1 && input.match(/[a-z0-9]/i);
 }
 
@@ -90,10 +118,10 @@ document.addEventListener('keydown', function(event) {
     }
     if (event.key === "ArrowUp") {
         document.getElementById("input").blur();
+        const length = inputElem.value.length;
+        inputElem.setSelectionRange(length, length);
         if (selectedResult === 0) {
             inputElem.focus();
-            const length = inputElem.value.length;
-            inputElem.setSelectionRange(length, length);
         }
         selectedResult = Math.max(selectedResult - 1, 0);
         updateSelectedResult();
@@ -131,8 +159,14 @@ document.addEventListener('keydown', function(event) {
     }
 
     if (isValidCharInput(event.key)) {
-        console.log("Key pressed: " + event.key);
+        resetResults();
         selectedResult = 0;
+        document.getElementById("input").focus();
+        updateSelectedResult();
+    }
+
+    if (isValidnonModidyInputchar(event.key)) {
+        document.getElementById("input").focus();
         updateSelectedResult();
     }
     
@@ -202,7 +236,8 @@ function moreResults() {
     gettingResultsLoading();
 
     let moreResults = results.length + 50;
-    ipcRenderer.invoke('search-query', moreResults + " " + document.getElementById("input").value).then((result) => {
+    ipcRenderer.invoke('search-query', moreResults + ' "' + document.getElementById("input").value + '"')
+    .then((result) => {
         setResults(result);
     });
 }

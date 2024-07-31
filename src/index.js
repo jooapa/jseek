@@ -54,6 +54,7 @@ ipcMain.handle('open-folder', (event, path) => {
 });
 
 function makeReply(reply, originalQuery) {
+    let whatType;
     // <div class="block">
     //     <img src="image1.jpg">
     //     <div class="info">
@@ -90,23 +91,25 @@ function makeReply(reply, originalQuery) {
     console.log(files.length);
     if (files.length === 0) {
         result += 
-        `<div class="block-info">
-            <div class="info">
-                <h2>No results found</h2>
-            </div>
+        `<div class="greeting">
+            <h2>No results found</h2>
         </div>`;
+        whatType = "No results";
     } else {
         result += 
         `<button class="block" onclick="moreResults()">
             More Results
         </button>`;
+        whatType = "More results";
     }
 
     console.log("-------------------------------");
     console.log(result);
     console.log("-------------------------------");
+    console.log(whatType);
+    console.log("-------------------------------");
 
-    return result;
+    return [result, whatType];
 }
 
 
