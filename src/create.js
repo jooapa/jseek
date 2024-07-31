@@ -24,6 +24,7 @@ function createWindow() {
         transparent: false,
         frame: false,
         alwaysOnTop: true,
+        skipTaskbar: true,
         webPreferences: {
             nodeIntegration: true,
 			enableRemoteModule: true,

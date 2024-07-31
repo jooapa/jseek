@@ -17,7 +17,7 @@ document.getElementById("input").addEventListener("input", (event) => {
             resetResults();
             return;
         }
-        document.getElementById("results").innerHTML = "Getting results...";
+        gettingResultsLoading()
         ipcRenderer.invoke('search-query', "1 " + input.value).then((result) => {
             setResults(result);
         });
@@ -29,6 +29,7 @@ document.getElementById("input").addEventListener("input", (event) => {
             resetResults();
             return;
         }
+        gettingResultsLoading()
         ipcRenderer.invoke('search-query', "5 " + input.value).then((result) => {
             setResults(result);
         });
@@ -40,11 +41,38 @@ document.getElementById("input").addEventListener("input", (event) => {
             resetResults();
             return;
         }
+        gettingResultsLoading()
         ipcRenderer.invoke('search-query', "10 " + input.value).then((result) => {
             setResults(result);
         });
     }, 2000);
 });
+
+function gettingResultsLoading() {
+    //         <div class="getting">
+    //             <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+    //         </div>
+
+    // add loading div between </div> and <button class="block" onclick="moreResults()">
+    let noBLocks = false;
+
+    const results = document.getElementById("results");
+    const blocks = results.getElementsByClassName("block");
+    if (blocks.length === 0) {
+        noBLocks = true;
+    }
+    const lastBlock = blocks[blocks.length - 1];
+    const loadingDiv = document.createElement("div");
+    loadingDiv.classList.add("getting");
+    loadingDiv.innerHTML = `<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>`;
+    if (!noBLocks) {
+        results.insertBefore(loadingDiv, lastBlock);
+    } else {
+        results.appendChild(loadingDiv);
+    }
+    // scroll to the bottom
+    // results.scrollTop = results.scrollHeight;
+}
 
 function isValidCharInput(input) {
     // check if the input the normal key
@@ -76,8 +104,24 @@ document.addEventListener('keydown', function(event) {
         if (blocks.length === 0) {
             return;
         }
+
+
         // simulate click
-        blocks[selectedResult].click();
+        if (selectedResult === blocks.length - 1) {
+            moreResults();
+            return;
+        }
+
+        const block = blocks[selectedResult];
+        const path = block.getAttribute("data-path");
+        const type = block.getAttribute("data-type");
+
+        // if shift is pressed, open the file in the explorer
+        if (event.shiftKey) {
+            openFile(path, type, true);
+        } else {
+            openFile(path, type);
+        }
     }
 
     if (event.key === "Tab") {
@@ -109,7 +153,7 @@ function updateSelectedResult() {
     }
 
     if (blocks.length > 0) {
-        blocks[selectedResult].scrollIntoView({ behavior: "auto", block: "center" });
+        blocks[selectedResult].scrollIntoView({ behavior: "instant", block: "center" });
     }
 }
 
@@ -135,8 +179,15 @@ function resetResults() {
     document.getElementById("results").innerHTML = "";
 }
 
-function openFile(path, type) {
+function openFile(path, type, explorer = false) {
     type = type.toLowerCase();
+    if (explorer) {
+        if (type === "file") {
+            path = path.substring(0, path.lastIndexOf("\\"));
+            type = "folder";
+        }
+    }
+    
     if (type === "folder" || type === "volume") {
         ipcRenderer.invoke('open-folder', path);
     } else if (type === "file") {
@@ -148,6 +199,8 @@ function openFile(path, type) {
 
 function moreResults() {
     // 50 more results
+    gettingResultsLoading();
+
     let moreResults = results.length + 50;
     ipcRenderer.invoke('search-query', moreResults + " " + document.getElementById("input").value).then((result) => {
         setResults(result);
@@ -159,8 +212,4 @@ ipcRenderer.on('start', (event, arg) => {
     inputElem.focus();
     const length = inputElem.value.length;
     inputElem.setSelectionRange(0, length);
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    Onload();
 });

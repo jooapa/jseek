@@ -46,12 +46,10 @@ ipcMain.handle('search-query', async (event, query) => {
 });
 
 ipcMain.handle('open-file', (event, path) => {
-    // open the file in the default application
     shell.openPath(path);
 });
 
 ipcMain.handle('open-folder', (event, path) => {
-    // open the file in the default application
     shell.openPath(path);
 });
 
@@ -64,7 +62,7 @@ function makeReply(reply, originalQuery) {
     //     </div>
     // </div>
     
-    /// Example reply: "C:\Users\Jooapa\Documents\GitHub\jammer\example\asd.jammer | asd.jammer | file\n"
+    /// Example reply: "C:\Users\Jooapa\Documents\GitHub\jammer\example\asd.jammer | asd.jammer | File\n"
     // split by ":" 
     
     let result = '';
@@ -99,10 +97,7 @@ function makeReply(reply, originalQuery) {
         </div>`;
     } else {
         result += 
-        `<button
-            class="block"
-            onclick="moreResults()"
-        >
+        `<button class="block" onclick="moreResults()">
             More Results
         </button>`;
     }

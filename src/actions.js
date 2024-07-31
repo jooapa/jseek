@@ -1,8 +1,15 @@
 const { spawn } = require('child_process');
 
+const debug = true;
+
 function search(query) {
-    const command = 'C:\\Users\\Jooapa\\Documents\\GitHub\\Lighthouse\\backend\\build\\jseek.exe '+ query;
-    
+    let command;
+    if (debug) {
+        command = 'C:\\Users\\Jooapa\\Documents\\GitHub\\Lighthouse\\backend\\build\\jseek.exe '+ query;
+    } else {
+        const command = 'jseek ' + query;
+    }
+
     const jseekRun = spawn(command, { shell: true });
     jseekRun.stdout.setEncoding('utf-8');
     jseekRun.stderr.setEncoding('utf-8');

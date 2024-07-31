@@ -1,12 +1,15 @@
 :root {
-    --bg-color: #3d3d3d;
-    --text-color: #ffffff;
-    --border-color: #747474;
-    --shadow-color: rgba(0, 0, 0, 0.8);
-    --placeholder-color: #2c2c2c;
-    --hover-color: #ffffff;
-    --path-text-color: #797979;
-    --highlight-color: #e2f6ff;
+    --bg-color: #607d8b; /* Medium blue-gray */
+    --results-bg-color: #78909c; /* Muted blue-gray */
+    --results-block-bg-color: #546e7a; /* Darker blue-gray */
+    --text-color: #e0f7fa; /* Light cyan */
+    --border-color: #90a4ae; /* Soft blue-gray */
+    --shadow-color: rgba(94, 76, 0, 0.5); /* Medium shadow */
+    --placeholder-color: #90a4ae; /* Soft blue-gray */
+    --hover-color: #e0f7fa; /* Light cyan */
+    --path-text-color: #b0bec5; /* Light blue-gray */
+    --highlight-color: #a7ffeb; /* Light pastel green */
+    
 }
 
 body {
@@ -16,7 +19,7 @@ body {
     font-weight: 200;
     background-color: var(--bg-color);
     padding: 10px;
-    border: 2px solid var(--border-color)
+    border: 1px solid var(--border-color)
 }
 
 #container {
@@ -34,6 +37,8 @@ body {
     display: grid;
     grid-template-columns: 10% 1fr; 
     grid-template-rows: 100%;
+
+    z-index: 2;
 }
 
 #container #search img {
@@ -41,6 +46,8 @@ body {
     height: 100%;
     /* svg drop shadow */
     filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.8));
+
+    z-index: 2;
 }
 
 #container #search input {
@@ -59,6 +66,8 @@ body {
     border-bottom: 2px solid #535353;
     transition: 1s cubic-bezier(0.075, 0.82, 0.165, 1);
     outline: none;
+
+    z-index: 2;
 }
 
 #container #search input::placeholder {
@@ -73,7 +82,19 @@ body {
     border-bottom: 5px solid var(--hover-color);
 }
 
+#container #gradiant-up {
+    /* z-index: -1;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+    overflow: hidden;
+    margin: 0;
+    padding: 0; */
+}
+
 #results {
+    background-color: var(--results-bg-color);
     width: 100%;
     height: 100%;
     display: flex;
@@ -84,6 +105,10 @@ body {
     /* scrollbar */
     scrollbar-width: thin;
     scrollbar-color: var(--hover-color) var(--bg-color);
+    /* inverse box shadow */
+    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.8);
+    /* border: 2px solid var(--border-color); */
+    z-index: 3;
 }
 
 #results .block {
@@ -94,11 +119,13 @@ body {
     height: fit-content;
     margin: 10px;
     padding: 10px;
-    background-color: var(--bg-color);
+    background-color: var(--results-block-bg-color);
     border: 2px solid var(--border-color);
     border-radius: 10px;
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.8);
     transition: 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+    z-index: 1;
 }
 
 #results .block .info {
@@ -123,9 +150,9 @@ body {
     color: var(--path-text-color);
     text-align: left;
     vertical-align: bottom;
-    word-wrap: break-word; /* Deprecated, but still widely supported */
-    overflow-wrap: break-word; /* Standard property */
-    word-break: break-all; /* Ensures long words break */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-all;
     margin: 0;
     padding: 0;
 }
@@ -135,9 +162,9 @@ body {
     color: var(--text-color);
     text-align: left;
     vertical-align: middle;
-    word-wrap: break-word; /* Deprecated, but still widely supported */
-    overflow-wrap: break-word; /* Standard property */
-    word-break: break-all; /* Ensures long words break */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-all;
     margin: 0;
     padding: 0;
 }
@@ -146,6 +173,17 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+#results .getting {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+    margin: 0;
+    padding: 0;
+    transition: 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 /* #results .block:hover {
@@ -161,4 +199,5 @@ body {
 #results .selected {
     border: 2px solid var(--hover-color);
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.8);
+    transform: scale(1.02);
 }
