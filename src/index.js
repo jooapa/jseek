@@ -50,6 +50,11 @@ ipcMain.handle('open-file', (event, path) => {
     shell.openPath(path);
 });
 
+ipcMain.handle('open-folder', (event, path) => {
+    // open the file in the default application
+    shell.openPath(path);
+});
+
 function makeReply(reply, originalQuery) {
     // <div class="block">
     //     <img src="image1.jpg">

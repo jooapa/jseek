@@ -1,13 +1,23 @@
+#define UNICODE
+#define _UNICODE
+
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <locale>
 #include <codecvt>
+#include <stdexcept>
 #include "Everything.h"
 
-std::wstring charToLPCWSTR(const std::string& charArray) {
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    return converter.from_bytes(charArray);
+std::wstring CharToLPCWSTR(const std::string& charArray) {
+    try {
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+        return converter.from_bytes(charArray);
+    } catch (const std::range_error& e) {
+        std::cerr << "Conversion error: " << e.what() << std::endl;
+        return L""; // Return an empty wide string on error
+    }
 }
 
 int main(int argc, char** argv) {
@@ -26,7 +36,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    std::wstring searchQuery = charToLPCWSTR(tmp_searchQuery);
+    std::wstring searchQuery = CharToLPCWSTR(tmp_searchQuery);
 
     Everything_SetSearchW(searchQuery.c_str());
     Everything_SetRequestFlags(EVERYTHING_REQUEST_FILE_NAME | EVERYTHING_REQUEST_PATH | EVERYTHING_REQUEST_DATE_MODIFIED);
@@ -48,7 +58,22 @@ int main(int argc, char** argv) {
             type = L"Unknown";
         }
 
-        std::wcout << Everything_GetResultPath(i) << L"\\" << Everything_GetResultFileName(i) << L"|" << Everything_GetResultFileName(i) << L"|" << type << L"\n";
+        LPCTSTR resultPath = Everything_GetResultPath(i);
+        LPCTSTR resultFileName = Everything_GetResultFileName(i);
+
+        // if first character is a \ then it is a volume
+        if (resultPath[0] == 0) {
+            type = L"Volume";
+        }
+
+
+        if (type == L"Volume") {
+            std::wcout << resultFileName << L"|" << resultFileName << L"|";
+        } else {
+            std::wcout << resultPath << L"\\" << resultFileName  << L"|" << resultFileName << L"|";
+        }
+
+        std::wcout << type << L"\n";
     }
 
     return 0;
