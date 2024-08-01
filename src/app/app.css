@@ -2,6 +2,7 @@
     --bg-color: #607d8b; /* Medium blue-gray */
     --results-bg-color: #78909c; /* Muted blue-gray */
     --results-block-bg-color: #546e7a; /* Darker blue-gray */
+    --results-block-bg-color-hover: #678492; /* Dark blue-gray */
     --text-color: #e0f7fa; /* Light cyan */
     --border-color: #90a4ae; /* Soft blue-gray */
     --shadow-color: rgba(94, 76, 0, 0.5); /* Medium shadow */
@@ -198,6 +199,7 @@ body {
 
 #results .selected {
     border: 2px solid var(--hover-color);
+    background-color: var(--results-block-bg-color-hover);
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.8);
     transform: scale(1.02);
 }

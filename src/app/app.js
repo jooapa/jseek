@@ -145,7 +145,7 @@ document.addEventListener('keydown', function(event) {
         const type = block.getAttribute("data-type");
 
         // if shift is pressed, open the file in the explorer
-        if (event.shiftKey) {
+        if (event.ctrlKey) {
             openFile(path, type, true);
         } else {
             openFile(path, type);
