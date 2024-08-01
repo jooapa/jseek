@@ -84,19 +84,26 @@ function gettingResultsLoading() {
     // scroll to the bottom
     // results.scrollTop = results.scrollHeight;
 }
+
 function isValidnonModidyInputchar(input) {
-        if (input === "ArrowLeft") return true;
-    if (input === "ArrowRight") return true;
+    if (input.key === "ArrowLeft") return true;
+    if (input.key === "ArrowRight") return true;
 }
+
 function isValidCharInput(input) {
-    console.log("Input: " + input);
-    if (input === "Backspace") return true;
-    if (input === " ") return true;
+    if (input.ctrlKey === true) return false;
+    if (input.altKey === true) return false;
+    if (input.metaKey === true) return false;
+
+
+    console.log("Input: " + input.key);
+    if (input.key === "Backspace") return true;
+    if (input.key === " ") return true;
 
     const specialChars = ['"', "'", '?', '!', '#', '¤', '%', '&', '/', '(', ')', '=', '?', '*', '+', '§', '£', '€', '{', '[', ']', '}', '\\', '|', '@', '£', '€', '½', '¼', '¾', '¬', '¦', '´', '`', '¨', '^', '~', '<', '>', ',', ';', ':', '.', '-'];
-    if (specialChars.includes(input)) return true;
+    if (specialChars.includes(input.key)) return true;
 
-    return input.length === 1 && input.match(/[a-z0-9]/i);
+    return input.key.length === 1 && input.key.match(/[a-z0-9]/i);
 }
 
 // event listener for key press
@@ -150,15 +157,16 @@ document.addEventListener('keydown', function(event) {
         event.preventDefault();
     }
 
-    if (isValidCharInput(event.key)) {
+    if (isValidCharInput(event)) {
         resetResults();
         selectedResult = 0;
-        document.getElementById("input").focus();
+        inputElem.focus();
+        inputElem.setSelectionRange(inputElem.value.length, inputElem.value.length);
         updateSelectedResult();
     }
 
-    if (isValidnonModidyInputchar(event.key)) {
-        document.getElementById("input").focus();
+    if (isValidnonModidyInputchar(event)) {
+        inputElem.focus();
         updateSelectedResult();
     }
     
