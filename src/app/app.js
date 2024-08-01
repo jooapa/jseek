@@ -12,51 +12,43 @@ document.getElementById("input").addEventListener("input", (event) => {
     const input = event.target;
 
     clearTimeout(debounceTimeoutFirst);
-    debounceTimeoutFirst = setTimeout(() => {
+    debounceTimeoutFirst = setTimeout(async () => {
         if (input.value.length === 0) {
             resetResults();
             return;
         }
         gettingResultsLoading()
-        ipcRenderer.invoke('search-query', '1 "' + input.value+'"').then((result) => {
-            console.log("What type: " + result[1]);
-            console.log("Result: " + result[0]);
-            // if (whatType === "No results") {
-            //     return;
-            // }
-            setResults(result[0]);
-            if (result[1] === "No results") {
-                clearTimeout(debounceTimeoutFirst);
-                clearTimeout(debounceTimeoutSecond);
-                clearTimeout(debounceTimeoutThird);
-                return;
-            }
-            
-        });
+        let newResults = await callSearch(1, input.value);
+
+        setResults(newResults[0]);
+        if (result[1] === "No results") {
+            clearTimeout(debounceTimeoutFirst);
+            clearTimeout(debounceTimeoutSecond);
+            clearTimeout(debounceTimeoutThird);
+            return;
+        }
     }, 100);
 
     clearTimeout(debounceTimeoutSecond);
-    debounceTimeoutSecond = setTimeout(() => {
+    debounceTimeoutSecond = setTimeout(async () => {
         if (input.value.length === 0) {
             resetResults();
             return;
         }
         gettingResultsLoading()
-        ipcRenderer.invoke('search-query', '5 "' + input.value+'"').then((result) => {
-            setResults(result[0]);
-        });
+        let newResults = await callSearch(5, input.value);
+        setResults(newResults[0]);
     }, 1000);
 
     clearTimeout(debounceTimeoutThird);
-    debounceTimeoutThird = setTimeout(() => {
+    debounceTimeoutThird = setTimeout(async () => {
         if (input.value.length === 0) {
             resetResults();
             return;
         }
         gettingResultsLoading()
-        ipcRenderer.invoke('search-query', '10 "' + input.value+'"').then((result) => {
-            setResults(result[0]);
-        });
+        let newResults = await callSearch(50, input.value);
+        setResults(newResults[0]);
     }, 2000);
 });
 
@@ -231,15 +223,25 @@ function openFile(path, type, explorer = false) {
     }
 }
 
-function moreResults() {
-    // 50 more results
+async function moreResults() {
     gettingResultsLoading();
-
+    // 50 more results
+    
     let moreResults = results.length + 50;
-    ipcRenderer.invoke('search-query', moreResults + ' "' + document.getElementById("input").value + '"')
-    .then((result) => {
-        setResults(result);
-    });
+    let newResults = await callSearch(moreResults);
+    
+    setResults(newResults[0]);
+}
+
+// returns array, where [0] is the result and [1] is the type of the result
+// types: 
+// ""
+// "No results"
+// "More results"
+async function callSearch(amount, query) {
+    gettingResultsLoading();
+    const result = await ipcRenderer.invoke('search-query', amount + ' "' + query + '"');
+    return result;
 }
 
 ipcRenderer.on('start', (event, arg) => {

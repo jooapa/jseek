@@ -1,15 +1,17 @@
 :root {
-    --bg-color: #607d8b; /* Medium blue-gray */
-    --results-bg-color: #78909c; /* Muted blue-gray */
-    --results-block-bg-color: #546e7a; /* Darker blue-gray */
-    --results-block-bg-color-hover: #678492; /* Dark blue-gray */
-    --text-color: #e0f7fa; /* Light cyan */
-    --border-color: #90a4ae; /* Soft blue-gray */
-    --shadow-color: rgba(94, 76, 0, 0.5); /* Medium shadow */
-    --placeholder-color: #90a4ae; /* Soft blue-gray */
-    --hover-color: #e0f7fa; /* Light cyan */
-    --path-text-color: #b0bec5; /* Light blue-gray */
-    --highlight-color: #a7ffeb; /* Light pastel green */
+    --bg-color: #607d8b;
+    --results-bg-color: #78909c;
+    --results-block-bg-color: #546e7a;
+    --results-block-bg-color-hover: #688797;
+    --results-block-bg-color-select: #5b7881;
+    --results-block-bg-color-select-hover: #6c8e9c;
+    --text-color: #e0f7fa;
+    --border-color: #90a4ae;
+    --shadow-color: rgba(94, 76, 0, 0.5);
+    --placeholder-color: #90a4ae;
+    --hover-color: #e0f7fa;
+    --path-text-color: #b0bec5;
+    --highlight-color: #a7ffeb;
     
 }
 
@@ -129,6 +131,27 @@ body {
     z-index: 1;
 }
 
+#results .block:hover,
+#results .selected {
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.8);
+}
+
+#results .block:hover {
+    transform: scale(1.01);
+    background-color: var(--results-block-bg-color-hover);
+    cursor: pointer;
+}
+
+#results .block.selected {
+    transform: scale(1.02);
+    background-color: var(--results-block-bg-color-select);
+}
+
+#results .block:hover.selected {
+    transform: scale(1.025);
+    background-color: var(--results-block-bg-color-select-hover);
+}
+
 #results .block .info {
     display: grid;
     grid-template-columns: 1fr;
@@ -195,11 +218,4 @@ body {
 #results .block:focus {
     border: 2px solid var(--hover-color);
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.8);
-}
-
-#results .selected {
-    border: 2px solid var(--hover-color);
-    background-color: var(--results-block-bg-color-hover);
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.8);
-    transform: scale(1.02);
 }
