@@ -4,12 +4,19 @@
     <link rel="stylesheet" type="text/css" href="app.css">
     <link rel="stylesheet" type="text/css" href="loader.css">
     <script defer src="app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
 </head>
 <body>
     <div id="container">
         <div id="search">
             <img src="search.svg">
-            <input id="input" type="text" placeholder="Search Something...">
+            <div class="input-container">
+                <div id="highlight-key"></div>
+                <input type="text" id="input" class="input-field" placeholder="Start Typing..."/>
+                </textarea>
+            </div>
         </div>
 
         <div id="results">
@@ -24,6 +31,7 @@
                 <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
             </div> -->
         </div>
+
     </div>
 </body>
 </html>
