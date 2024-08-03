@@ -97,8 +97,8 @@ function makeReply(reply, originalQuery) {
         whatType = "No results";
     } else {
         result += 
-        `<button class="block" onclick="moreResults()">
-            More Results
+        `<button class="block" id="more" onclick="moreResults()">
+            More results...
         </button>`;
         whatType = "More results";
     }

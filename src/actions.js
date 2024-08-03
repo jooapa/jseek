@@ -1,36 +1,45 @@
 const { spawn } = require('child_process');
+const { debug } = require('./config');
 
-const debug = true;
+let currentJseekProcess = null;
 
 function search(query) {
     let command;
     if (debug) {
-        command = 'C:\\Users\\Jooapa\\Documents\\GitHub\\Lighthouse\\backend\\build\\jseek.exe '+ query;
+        command = 'C:\\Users\\Jooapa\\Documents\\GitHub\\Lighthouse\\backend\\build\\jseek.exe ' + query;
     } else {
-        const command = 'jseek ' + query;
+        command = 'jseek ' + query;
     }
 
-    const jseekRun = spawn(command, { shell: true });
-    jseekRun.stdout.setEncoding('utf-8');
-    jseekRun.stderr.setEncoding('utf-8');
+    // Kill existing jseek process if running
+    if (currentJseekProcess) {
+        currentJseekProcess.kill();
+    }
+
+    // Start new jseek process
+    currentJseekProcess = spawn(command, { shell: true });
+    currentJseekProcess.stdout.setEncoding('utf-8');
+    currentJseekProcess.stderr.setEncoding('utf-8');
 
     return new Promise((resolve, reject) => {
         let result = '';
         let error = '';
-        jseekRun.stdout.on('data', (data) => {
+        currentJseekProcess.stdout.on('data', (data) => {
             result += data;
         });
 
-        jseekRun.stderr.on('data', (data) => {
+        currentJseekProcess.stderr.on('data', (data) => {
             error += data;
         });
 
-        jseekRun.on('close', (code) => {
+        currentJseekProcess.on('close', (code) => {
             if (code === 0) {
                 resolve(result);
             } else {
                 reject(new Error(error));
             }
+            // Clear the current process reference
+            currentJseekProcess = null;
         });
     });
 }

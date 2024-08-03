@@ -1,5 +1,5 @@
 const { ipcRenderer } = require('electron');
-
+const keywords = require('../config');
 
 let debounceTimeoutFirst;
 let debounceTimeoutSecond;
@@ -8,29 +8,29 @@ let debounceTimeoutThird;
 let selectedResult = 0;
 let results = [];
 
-const keywords = ["function", "variable", "return"];
+
         
 function escapeHtml(text) {
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
-function fuzzySearchHighlight(text, keywords) {
-    const escapedText = escapeHtml(text);
-    let highlightedText = escapedText;
+// function fuzzySearchHighlight(text, keywords) {
+//     const escapedText = escapeHtml(text);
+//     let highlightedText = escapedText;
 
-    keywords.forEach(keyword => {
-        const regex = new RegExp(`(${keyword.split('').join('.*?')})`, 'gi');
-        highlightedText = highlightedText.replace(regex, '<span class="highlight-key">$1</span>');
-    });
+//     keywords.forEach(keyword => {
+//         const regex = new RegExp(`(${keyword.split('').join('.*?')})`, 'gi');
+//         highlightedText = highlightedText.replace(regex, '<span class="highlight-key">$1</span>');
+//     });
 
-    return highlightedText;
-}
+//     return highlightedText;
+// }
 
 document.getElementById("input").addEventListener("input", (event) => {
     const input = event.target;
 
-    const highlightedHtml = fuzzySearchHighlight(input.value, keywords);
-    document.getElementById('highlight-key').innerHTML = highlightedHtml;
+    // const highlightedHtml = fuzzySearchHighlight(input.value, keywords);
+    // document.getElementById('highlight-key').innerHTML = highlightedHtml;
 
     clearTimeout(debounceTimeoutFirst);
     debounceTimeoutFirst = setTimeout(async () => {
@@ -121,7 +121,7 @@ function isValidCharInput(input) {
     if (input.key === "Backspace") return true;
     if (input.key === " ") return true;
 
-    const specialChars = ['"', "'", '?', '!', '#', '¤', '%', '&', '/', '(', ')', '=', '?', '*', '+', '§', '£', '€', '{', '[', ']', '}', '\\', '|', '@', '£', '€', '½', '¼', '¾', '¬', '¦', '´', '`', '¨', '^', '~', '<', '>', ',', ';', ':', '.', '-'];
+    const specialChars = ['"', "'", '?', '!', '#', '¤', '%', '&', '/', '(', ')', '=', '?', '*', '+', '§', '£', '€', '{', '[', ']', '}', '\\', '|', '@', '£', '€', '½', '¼', '¾', '¬', '¦', '´', '`', '¨', '^', '~', '<', '>', ',', ';', ':', '.', '-', "_"];
     if (specialChars.includes(input.key)) return true;
 
     return input.key.length === 1 && input.key.match(/[a-z0-9]/i);
