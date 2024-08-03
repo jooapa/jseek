@@ -1,7 +1,7 @@
 const debug = true;
 
 /// intesity: means how much the macro should be used in the search query, meaning how much it will lag the search
-const Macros = [
+const Keywords = [
     [
         ':',
         [
@@ -100,9 +100,7 @@ const Macros = [
         ],
         ["intensity", 0],
     ],
-];
-
-const Modifiers = [
+    // Modifiers
     [
         'ascii:',
         'utf8:',
@@ -189,10 +187,8 @@ const Modifiers = [
             'Enable or disable wildcards.'
         ],
         ["intensity", 0],
-    ]
-];
-
-const Functions = [
+    ],
+    // Functions
     [
         'dupe:',
         'attribdupe:',
@@ -486,6 +482,9 @@ const Functions = [
     ],
 ];
 
+function getNameAttribs(name) {
+    
+}
 
 const SizeInfo  = [
     [
@@ -532,6 +531,8 @@ const DateInfo = [
 
 module.exports = {
     debug,
-    Macros,
-    Modifiers,
+    Keywords,
+    SizeInfo,
+    DateInfo,
+    getNameAttribs,
 };

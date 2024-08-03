@@ -1,5 +1,7 @@
 const { ipcRenderer } = require('electron');
-const keywords = require('../config');
+const {
+    getNameAttribs,
+} = require('../config');
 
 let debounceTimeoutFirst;
 let debounceTimeoutSecond;
@@ -7,30 +9,30 @@ let debounceTimeoutThird;
 
 let selectedResult = 0;
 let results = [];
-
-
         
 function escapeHtml(text) {
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
-// function fuzzySearchHighlight(text, keywords) {
-//     const escapedText = escapeHtml(text);
-//     let highlightedText = escapedText;
+let keywords;
 
-//     keywords.forEach(keyword => {
-//         const regex = new RegExp(`(${keyword.split('').join('.*?')})`, 'gi');
-//         highlightedText = highlightedText.replace(regex, '<span class="highlight-key">$1</span>');
-//     });
+function fuzzySearchHighlight(text, keywords) {
+    const escapedText = escapeHtml(text);
+    let highlightedText = escapedText;
 
-//     return highlightedText;
-// }
+    keywords.forEach(keyword => {
+        const regex = new RegExp(`(${keyword.split('').join('.*?')})`, 'gi');
+        highlightedText = highlightedText.replace(regex, '<span class="highlight-key">$1</span>');
+    });
+
+    return highlightedText;
+}
 
 document.getElementById("input").addEventListener("input", (event) => {
     const input = event.target;
-
-    // const highlightedHtml = fuzzySearchHighlight(input.value, keywords);
-    // document.getElementById('highlight-key').innerHTML = highlightedHtml;
+    
+    const highlightedHtml = fuzzySearchHighlight(input.value, keywords);
+    document.getElementById('highlight-key').innerHTML = highlightedHtml;
 
     clearTimeout(debounceTimeoutFirst);
     debounceTimeoutFirst = setTimeout(async () => {
@@ -133,7 +135,11 @@ document.addEventListener('keydown', function(event) {
 
     if (event.key === "ArrowDown") {
         document.getElementById("input").blur();
-        selectedResult = Math.min(selectedResult + 1, results.length - 1);
+        if (event.ctrlKey) {
+            selectedResult = results.length - 2;
+        } else {
+            selectedResult = Math.min(selectedResult + 1, results.length - 1);
+        }
         updateSelectedResult();
     }
     if (event.key === "ArrowUp") {
@@ -143,7 +149,13 @@ document.addEventListener('keydown', function(event) {
         if (selectedResult === 0) {
             inputElem.focus();
         }
-        selectedResult = Math.max(selectedResult - 1, 0);
+
+        if (event.ctrlKey) {
+            selectedResult = 0;
+        } else {
+            selectedResult = Math.max(selectedResult - 1, 0);
+        }
+
         updateSelectedResult();
     }
 
@@ -257,7 +269,7 @@ async function moreResults() {
     // 50 more results
     
     let moreResults = results.length + 50;
-    let newResults = await callSearch(moreResults);
+    let newResults = await callSearch(moreResults, document.getElementById("input").value);
     
     setResults(newResults[0]);
 }
