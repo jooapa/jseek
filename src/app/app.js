@@ -1,6 +1,6 @@
 const { ipcRenderer } = require('electron');
 const {
-    getNameAttribs,
+    Keywords,
 } = require('../config');
 
 let debounceTimeoutFirst;
@@ -11,28 +11,83 @@ let selectedResult = 0;
 let results = [];
         
 function escapeHtml(text) {
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    if (typeof text !== 'string') {
+        text = String(text);
+    }
+    return text.replace(/&/g, "&amp;")
+               .replace(/</g, "&lt;")
+               .replace(/>/g, "&gt;")
+               .replace(/"/g, "&quot;")
+               .replace(/'/g, "&#039;");
 }
 
-let keywords;
-
-function fuzzySearchHighlight(text, keywords) {
+// example
+// [
+//     ['content:', 'ansicontent:', 'utf8content:', 'utf16content:', 'utf16becontent:'],
+//     ['Search file content.'],
+//     ["intensity", 100]
+// ],
+function fuzzySearchHighlight(text) {
     const escapedText = escapeHtml(text);
     let highlightedText = escapedText;
+    const keywords = Keywords;
+    
+    let Intensities = [];
+    for (let i = 0; i < keywords.length; i++) {
+        const keywordArray = keywords[i][0];
+        const description = keywords[i][1];
+        const intensity = keywords[i][2];
 
-    keywords.forEach(keyword => {
-        const regex = new RegExp(`(${keyword.split('').join('.*?')})`, 'gi');
-        highlightedText = highlightedText.replace(regex, '<span class="highlight-key">$1</span>');
-    });
+        let intensityKey;
+        if (intensity[1] === 0) {
+            intensityKey = "fast-key";
+        } else if (intensity[1] === 50) {
+            intensityKey = "medium-key";
+        } else if (intensity[1] === 100) {
+            intensityKey = "slow-key";
+        } else if (intensity[1] === -1) {
+            intensityKey = "op-key";
+        }
+        
+        for (let j = 0; j < keywordArray.length; j++) {
+            const keyword = keywordArray[j];
+            const escapedKeyword = escapeHtml(keyword);
+            
 
-    return highlightedText;
+            const regex = new RegExp(escapedKeyword, "gi");
+            const match = escapedText.match(regex);
+            if (match) {
+                Intensities.push(intensity[1]);
+
+                highlightedText = highlightedText.replace(regex, `<span class="highlight-key ${intensityKey}">${match[0]}</span>`);
+            }
+        }
+    }
+    const regex = /(?<!<[^>]*)\s(?![^<]*>)/g;
+
+    highlightedText = highlightedText.replace(regex, '<span class="highlight-key invi-key"> </span>');
+
+    intiFact = null;
+    const intiFoundSlow = Intensities.find((element) => element === 100);
+
+
+    if (intiFoundSlow !== undefined) {
+        intiFact = "Slow";
+    }
+
+    return [highlightedText, intiFact];
 }
 
 document.getElementById("input").addEventListener("input", (event) => {
     const input = event.target;
     
-    const highlightedHtml = fuzzySearchHighlight(input.value, keywords);
-    document.getElementById('highlight-key').innerHTML = highlightedHtml;
+    const highlighted = fuzzySearchHighlight(input.value);
+    document.getElementById('highlight-key').innerHTML = highlighted[0];
+
+    if (highlighted[1] === "Slow") {
+        setResults("SLOW");
+        return;
+    }
 
     clearTimeout(debounceTimeoutFirst);
     debounceTimeoutFirst = setTimeout(async () => {

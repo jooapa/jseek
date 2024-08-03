@@ -59,18 +59,6 @@ body {
     overflow: hidden;
 }
 
-.highlight-key {
-    background-color: #ababab70;
-    color: rgba(255, 255, 255, 0);
-    padding: 2px;
-    border-radius: 3px;
-    display: block;
-    width: fit-content;
-    font-size: 1em;
-    height: fit-content;
-    overflow: hidden;
-}
-
 #highlight-key {
     position: absolute;
     top: 9%;
@@ -88,7 +76,43 @@ body {
     color: transparent;
     font-size: 2em;
     overflow: hidden;
+    z-index: -1;
 }
+
+.highlight-key {
+    background-color: #2929295e;
+    color: rgba(255, 255, 255, 0);
+    padding: 0px;
+    border-radius: 3px;
+    display: block;
+    width: fit-content;
+    font-size: 1em;
+    height: fit-content;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.fast-key {
+    border-bottom: 4px solid #00c01a;
+}
+
+.medium-key {
+    border-bottom: 4px solid #e2c000;
+}
+
+.slow-key {
+    border-bottom: 4px solid #ff0000;
+}
+
+.op-key {
+    border-bottom: 4px solid #acacac;
+}
+
+.invi-key {
+    background-color: #00000000;
+    border: none;
+}
+
 
 #container #search input {
     width: 100%;
