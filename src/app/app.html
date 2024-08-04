@@ -15,10 +15,21 @@
             <div class="input-container">
                 <div id="highlight-key"></div>
                 <input type="text" id="input" class="input-field" placeholder="Start Typing..."/>
-                </textarea>
+                <div id="finder-container">
+                    <div id="finder">
+                        <div id="finder-type">
+                            <p>regex:</p>
+                        </div>
+                        <div id="finder-doc">
+                            <p>Enable or disable regex.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
+        <div id="search-button-container">
+            <button id="search-button" class="hidden">Search</button>
+        </div>
         <div id="results">
             <!-- <div class="block" onclick="openFile()">
                 <img src="image1.jpg">
