@@ -6,7 +6,7 @@ let currentJseekProcess = null;
 function search(query) {
     let command;
     if (debug) {
-        command = 'C:\\Users\\Jooapa\\Documents\\GitHub\\Lighthouse\\backend\\build\\jseek.exe ' + query;
+        command = 'backend\\build\\jseek.exe ' + query;
     } else {
         command = 'jseek ' + query;
     }
