@@ -53,6 +53,10 @@ ipcMain.handle('open-folder', (event, path) => {
     shell.openPath(path);
 });
 
+ipcMain.handle('open-web', (event, path) => {
+    shell.openExternal(path);
+});
+
 function makeReply(reply, originalQuery) {
     let whatType;
     // <div class="block">
@@ -63,7 +67,7 @@ function makeReply(reply, originalQuery) {
     //     </div>
     // </div>
     
-    /// Example reply: "C:\Users\Jooapa\Documents\GitHub\jammer\example\asd.jammer | asd.jammer | File\n"
+    /// Example reply: "C:\Users\user\Documents\file.txt|file.txt|File|Display Name|Info Name\n"
     // split by ":" 
     
     let result = '';
@@ -75,15 +79,15 @@ function makeReply(reply, originalQuery) {
             return;
         }
         file = file.substring(0, file.length - 1);
-        let [path, name, type] = file.split('|');
+        let [path, name, type, displayName, infoName] = file.split('|');
 
         let betterPath = path.replace(/\\/g, '\\\\');
         result += 
         `<div class="block" data-type="${type}" data-path="${path}" onclick="openFile('${betterPath}', '${type}')">
             <img src="image1.jpg">
             <div class="info">
-                <h2 class="name">${highlightResults(name, originalQuery)}</h2>
-                <p class="path">${highlightResults(path, originalQuery)}</p>
+                <h2 class="name">${highlightResults(displayName, originalQuery)}</h2>
+                <p class="path">${highlightResults(infoName, originalQuery)}</p>
             </div>
         </div>`;
     });

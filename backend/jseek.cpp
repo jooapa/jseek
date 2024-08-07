@@ -11,17 +11,50 @@
 #include <shlwapi.h>
 #include <stdexcept>
 #include "Everything.h"
+#include "Windows.h"
+#include <cstdint>
+#include <wincodec.h>
+#include <fstream>
+#include <shellapi.h>
+#include <gdiplus.h>
+#include <iomanip>
 
-// Function to get the icon handle
-HICON GetFileIcon(const std::wstring& path) {
-    SHFILEINFO shFileInfo;
-    ZeroMemory(&shFileInfo, sizeof(SHFILEINFO));
+enum class Type {
+    File,
+    Folder,
+    Volume,
+    Web,
+    Other
+};
 
-    // Get the icon handle
-    if (SHGetFileInfo(path.c_str(), 0, &shFileInfo, sizeof(SHFILEINFO), SHGFI_ICON | SHGFI_LARGEICON)) {
-        return shFileInfo.hIcon;
-    }
-    return nullptr;
+// Example output for one search result:
+// C:\Users\user\Documents\file.txt|file.txt|Type|Display Name|Info Name\n
+void makeReply(std::string path, std::string name, Type type, std::string displayName, std::string infoName) {
+    std::string reply = 
+        path 
+    + "|" + 
+        name 
+    + "|" + 
+        (type == 
+        Type::File ? "File" : 
+        type == Type::Folder    ? "Folder" : 
+        type == Type::Volume    ? "Volume" : 
+        type == Type::Web       ? "Web" : 
+        type == Type::Other     ? "Other" : 
+        "Unknown"
+        ) 
+    + "|" + 
+        displayName 
+    + "|" + 
+        infoName 
+    + "\n";
+
+    std::cout << reply;
+}
+// Function to convert std::wstring to std::string
+std::string wstring_to_string(const std::wstring& wstr) {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    return converter.to_bytes(wstr);
 }
 
 std::wstring CharToLPCWSTR(const std::string& charArray) {
@@ -31,6 +64,56 @@ std::wstring CharToLPCWSTR(const std::string& charArray) {
     } catch (const std::range_error& e) {
         std::cerr << "Conversion error: " << e.what() << std::endl;
         return L""; // Return an empty wide string on error
+    }
+}
+
+bool g_isWebSearch = false;
+bool y_isWebSearch = false;
+bool b_isWebSearch = false;
+bool d_isWebSearch = false;
+bool w_isWebSearch = false;
+
+void PrintWebSearch(std::wstring searchQuery) {
+    // std::wcout << "searchQuery: '" << searchQuery << "'" << std::endl;
+    std::string searchUsing;
+    if (searchQuery.size() < 2) {
+        return;
+    }
+    std::string searchQueryStr = wstring_to_string(searchQuery.substr(2));
+    std::string searchUrl;
+    std::string SearchDisplay;
+    // if the first two character is a "g " then it is a google search
+    if (searchQuery[0] == L'g' && searchQuery[1] == L' ') {
+        g_isWebSearch = true;
+        searchUsing = "Search using Google search";
+        searchUrl = "https://www.google.com/search?q=" + searchQueryStr;
+
+    } else if (searchQuery[0] == L'y' && searchQuery[1] == L' ') {
+        y_isWebSearch = true;
+        searchUsing = "Search using Yahoo search";
+        searchUrl = "https://search.yahoo.com/search?p=" + searchQueryStr;
+    } else if (searchQuery[0] == L'b' && searchQuery[1] == L' ') {
+        b_isWebSearch = true;
+        searchUsing = "Search using Bing search";
+        searchUrl = "https://www.bing.com/search?q=" + searchQueryStr;
+    } else if (searchQuery[0] == L'd' && searchQuery[1] == L' ') {
+        d_isWebSearch = true;
+        searchUsing = "Search using DuckDuckGo search";
+        searchUrl = "https://duckduckgo.com/?q=" + searchQueryStr;
+    } else if (searchQuery[0] == L'w' && searchQuery[1] == L' ') {
+        w_isWebSearch = true;
+        searchUsing = "Search using Wikipedia search";
+        searchUrl = "https://en.wikipedia.org/wiki/" + searchQueryStr;
+    }
+    
+    if (g_isWebSearch || y_isWebSearch || b_isWebSearch || d_isWebSearch || w_isWebSearch) {
+        makeReply(
+            searchUrl,
+            searchUsing,
+            Type::Web,
+            searchQueryStr == "" ? "Type something to search.." : searchQueryStr,
+            searchUsing
+        );
     }
 }
 
@@ -52,6 +135,9 @@ int main(int argc, char** argv) {
 
     std::wstring searchQuery = CharToLPCWSTR(tmp_searchQuery);
 
+    PrintWebSearch(searchQuery);
+    // return 0;
+
     Everything_SetSearchW(searchQuery.c_str());
     Everything_SetRequestFlags(EVERYTHING_REQUEST_FILE_NAME | EVERYTHING_REQUEST_PATH | EVERYTHING_REQUEST_DATE_MODIFIED);
     // set the sort to sort by the best match
@@ -59,50 +145,59 @@ int main(int argc, char** argv) {
     Everything_SetMax(max_results);
 
     Everything_Query(TRUE);
-
+    
     for (DWORD i = 0; i < Everything_GetNumResults(); ++i) {
-        // determine file type
-        std::wstring type;
-        if (Everything_IsFileResult(i)) {
-            type = L"File";
-        } else if (Everything_IsFolderResult(i)) {
-            type = L"Folder";
-        } else if (Everything_IsVolumeResult(i)) {
-            type = L"Volume";
-        } else {
-            type = L"Unknown";
+            // determine file type
+            Type type;
+            if (Everything_IsFileResult(i)) {
+                type = Type::File;
+            } else if (Everything_IsFolderResult(i)) {
+                type = Type::Folder;
+            } else if (Everything_IsVolumeResult(i)) {
+                type = Type::Volume;
+            } else {
+                type = Type::Other;
+            }
+    
+            LPCTSTR resultPath = Everything_GetResultPath(i);
+            LPCTSTR resultFileName = Everything_GetResultFileName(i);
+    
+            // if first character is a \ then it is a volume
+            if (resultPath[0] == 0) {
+                type = Type::Volume;
+            }
+    
+            std::wstring fullFilePath;
+    
+            if (type == Type::Volume) {
+                fullFilePath = resultFileName;
+            } else {
+                fullFilePath = std::wstring(resultPath) + L"\\" + resultFileName;
+            }
+    
+            // std::wcout << 
+            //     fullFilePath 
+            // << L"|" << 
+            //     resultFileName 
+            // << L"|" << 
+            //     type 
+            // << L"|" <<
+            //     resultFileName 
+            // << L"|" <<
+            //     fullFilePath
+            // << L"\n";
+
+            makeReply(
+                wstring_to_string(fullFilePath),
+                wstring_to_string(resultFileName),
+                type,
+                wstring_to_string(resultFileName),
+                wstring_to_string(fullFilePath)
+            );
+    
         }
 
-        LPCTSTR resultPath = Everything_GetResultPath(i);
-        LPCTSTR resultFileName = Everything_GetResultFileName(i);
-
-        // if first character is a \ then it is a volume
-        if (resultPath[0] == 0) {
-            type = L"Volume";
-        }
-
-        // get the icon handle
-        HICON icon = GetFileIcon(resultPath);
-
-        // get the icon index
-        int iconIndex = 0;
-        if (icon) {
-            iconIndex = LookupIconIdFromDirectoryEx((PBYTE)icon, TRUE, 0, 0, LR_DEFAULTCOLOR);
-        }
-
-        // free the icon handle
-        if (icon) {
-            DestroyIcon(icon);
-        }
-
-        if (type == L"Volume") {
-            std::wcout << resultFileName << L"|" << resultFileName << L"|";
-        } else {
-            std::wcout << resultPath << L"\\" << resultFileName  << L"|" << resultFileName << L"|";
-        }
-
-        std::wcout << type << L"|" << iconIndex << std::endl;
-    }
+    Everything_CleanUp();
 
     return 0;
 }

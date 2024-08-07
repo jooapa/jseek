@@ -76,6 +76,7 @@
 		"everything.h": "c",
 		"any": "cpp",
 		"codecvt": "cpp",
-		"set": "cpp"
+		"set": "cpp",
+		"winbase.h": "c"
 	}
 }

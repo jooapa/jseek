@@ -27,6 +27,11 @@ function escapeHtml(text) {
 //     ['Search file content.'],
 //     ["intensity", 100]
 // ],
+
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
 function fuzzySearchHighlight(text) {
     const escapedText = escapeHtml(text);
     let highlightedText = escapedText;
@@ -37,6 +42,8 @@ function fuzzySearchHighlight(text) {
         const keywordArray = keywords[i][0];
         const description = keywords[i][1];
         const intensity = keywords[i][2];
+        const start = keywords[i][3];
+        
 
         let intensityKey;
         if (intensity[1] === 0) {
@@ -53,13 +60,22 @@ function fuzzySearchHighlight(text) {
             const keyword = keywordArray[j];
             const escapedKeyword = escapeHtml(keyword);
             
-
-            const regex = new RegExp(escapedKeyword, "gi");
-            const match = escapedText.match(regex);
-            if (match) {
-                Intensities.push(intensity[1]);
-
-                highlightedText = highlightedText.replace(regex, `<span class="highlight-key ${intensityKey}">${match[0]}</span>`);
+            if (start) {
+                // match the start of the string until the first space
+                const regex = new RegExp(`^${escapeRegExp(escapedKeyword)}\\s`, "gi");
+                const match = escapedText.match(regex);
+                if (match) {
+                    Intensities.push(intensity[1]);
+                    highlightedText = highlightedText.replace(regex, `<span class="highlight-key ${intensityKey}">${match[0]}</span>`);
+                }
+            }
+            else {
+                const regex = new RegExp(escapeRegExp(escapedKeyword), "gi");
+                const match = escapedText.match(regex);
+                if (match) {
+                    Intensities.push(intensity[1]);
+                    highlightedText = highlightedText.replace(regex, `<span class="highlight-key ${intensityKey}">${match[0]}</span>`);
+                }
             }
         }
     }
@@ -314,6 +330,8 @@ function openFile(path, type, explorer = false) {
         ipcRenderer.invoke('open-folder', path);
     } else if (type === "file") {
         ipcRenderer.invoke('open-file', path);
+    } else if (type === "web") {
+        ipcRenderer.invoke('open-web', path);
     } else {
         console.error("Unknown type: " + type);
     }
