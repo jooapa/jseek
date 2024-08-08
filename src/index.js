@@ -82,8 +82,13 @@ function makeReply(reply, originalQuery) {
         let [path, name, type, displayName, infoName] = file.split('|');
 
         let betterPath = path.replace(/\\/g, '\\\\');
+        let idName = "block";
+        if (type === "Web") {
+            idName = "web";
+        }
+
         result += 
-        `<div class="block" data-type="${type}" data-path="${path}" onclick="openFile('${betterPath}', '${type}')">
+        `<div id="${idName}" class="block" data-type="${type}" data-path="${path}" onclick="openFile('${betterPath}', '${type}')">
             <img src="image1.jpg">
             <div class="info">
                 <h2 class="name">${highlightResults(displayName, originalQuery)}</h2>
@@ -92,7 +97,13 @@ function makeReply(reply, originalQuery) {
         </div>`;
     });
 
+    isWeb = files[0].split('|')[2] === "Web";
     console.log(files.length);
+    // if the first is a web search dont count it in the lenght
+    if (isWeb) {
+        files.shift();
+    }
+
     if (files.length === 0) {
         result += 
         `<div class="greeting">

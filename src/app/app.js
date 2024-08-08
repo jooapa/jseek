@@ -54,6 +54,8 @@ function fuzzySearchHighlight(text) {
             intensityKey = "slow-key";
         } else if (intensity[1] === -1) {
             intensityKey = "op-key";
+        } else if (intensity[1] === -1 && start === true) {
+            intensityKey = "start-key";
         }
         
         for (let j = 0; j < keywordArray.length; j++) {
@@ -62,7 +64,7 @@ function fuzzySearchHighlight(text) {
             
             if (start) {
                 // match the start of the string until the first space
-                const regex = new RegExp(`^${escapeRegExp(escapedKeyword)}\\s`, "gi");
+                const regex = new RegExp(`^${escapeRegExp(escapedKeyword)}`, "gi");
                 const match = escapedText.match(regex);
                 if (match) {
                     Intensities.push(intensity[1]);
@@ -115,13 +117,13 @@ document.getElementById("input").addEventListener("input", (event) => {
         let newResults = await callSearch(1, input.value);
 
         setResults(newResults[0]);
-        if (result[1] === "No results") {
-            clearTimeout(debounceTimeoutFirst);
-            clearTimeout(debounceTimeoutSecond);
-            clearTimeout(debounceTimeoutThird);
-            return;
-        }
-    }, 100);
+        // if (newResults[1] === "No results") {
+        //     clearTimeout(debounceTimeoutFirst);
+        //     clearTimeout(debounceTimeoutSecond);
+        //     clearTimeout(debounceTimeoutThird);
+        //     return;
+        // }
+    }, 69);
 
     clearTimeout(debounceTimeoutSecond);
     debounceTimeoutSecond = setTimeout(async () => {
@@ -130,20 +132,26 @@ document.getElementById("input").addEventListener("input", (event) => {
             return;
         }
         gettingResultsLoading()
-        let newResults = await callSearch(5, input.value);
+        let newResults = await callSearch(2, input.value);
         setResults(newResults[0]);
-    }, 1000);
+        // if (newResults[1] === "No results") {
+        //     clearTimeout(debounceTimeoutFirst);
+        //     clearTimeout(debounceTimeoutSecond);
+        //     clearTimeout(debounceTimeoutThird);
+        //     return;
+        // }
+    }, 300);
 
-    clearTimeout(debounceTimeoutThird);
-    debounceTimeoutThird = setTimeout(async () => {
-        if (input.value.length === 0) {
-            resetResults();
-            return;
-        }
-        gettingResultsLoading()
-        let newResults = await callSearch(50, input.value);
-        setResults(newResults[0]);
-    }, 2000);
+    // clearTimeout(debounceTimeoutThird);
+    // debounceTimeoutThird = setTimeout(async () => {
+    //     if (input.value.length === 0) {
+    //         resetResults();
+    //         return;
+    //     }
+    //     gettingResultsLoading()
+    //     let newResults = await callSearch(10, input.value);
+    //     setResults(newResults[0]);
+    // }, 1000);
 });
 
 function gettingResultsLoading() {
@@ -152,29 +160,29 @@ function gettingResultsLoading() {
     //         </div>
 
     // add loading div between </div> and <button class="block" onclick="moreResults()">
-    let noBLocks = false;
+    // let noBLocks = false;
 
-    const results = document.getElementById("results");
-    const blocks = results.getElementsByClassName("block");
-    if (blocks.length === 0) {
-        noBLocks = true;
-    }
+    // const results = document.getElementById("results");
+    // const blocks = results.getElementsByClassName("block");
+    // if (blocks.length === 0) {
+    //     noBLocks = true;
+    // }
 
-    // if already exists, remove it
-    const existingLoadingDiv = results.getElementsByClassName("getting");
-    if (existingLoadingDiv.length > 0) {
-        existingLoadingDiv[0].remove();
-    }
+    // // if already exists, remove it
+    // const existingLoadingDiv = results.getElementsByClassName("getting");
+    // if (existingLoadingDiv.length > 0) {
+    //     existingLoadingDiv[0].remove();
+    // }
 
-    const lastBlock = blocks[blocks.length - 1];
-    const loadingDiv = document.createElement("div");
-    loadingDiv.classList.add("getting");
-    loadingDiv.innerHTML = `<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>`;
-    if (!noBLocks) {
-        results.insertBefore(loadingDiv, lastBlock);
-    } else {
-        results.appendChild(loadingDiv);
-    }
+    // const lastBlock = blocks[blocks.length - 1];
+    // const loadingDiv = document.createElement("div");
+    // loadingDiv.classList.add("getting");
+    // loadingDiv.innerHTML = `<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>`;
+    // if (!noBLocks && !lastBlock.classList.contains("block-web")) {
+    //     results.insertBefore(loadingDiv, lastBlock);
+    // } else {
+    //     results.appendChild(loadingDiv);
+    // }
     // scroll to the bottom
     // results.scrollTop = results.scrollHeight;
 }
@@ -238,10 +246,10 @@ document.addEventListener('keydown', function(event) {
 
 
         // simulate click
-        if (selectedResult === blocks.length - 1) {
-            moreResults();
-            return;
-        }
+        // if (selectedResult === blocks.length - 1) {
+        //     moreResults();
+        //     return;
+        // }
 
         const block = blocks[selectedResult];
         const path = block.getAttribute("data-path");

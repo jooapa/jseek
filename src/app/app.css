@@ -107,6 +107,9 @@ body {
 .op-key {
     border-bottom: 4px solid #acacac;
 }
+.start-key {
+    border-bottom: 4px solid #696969;
+}
 
 .invi-key {
     background-color: #00000000;

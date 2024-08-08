@@ -73,50 +73,63 @@ bool b_isWebSearch = false;
 bool d_isWebSearch = false;
 bool w_isWebSearch = false;
 
-void PrintWebSearch(std::wstring searchQuery) {
-    // std::wcout << "searchQuery: '" << searchQuery << "'" << std::endl;
-    std::string searchUsing;
+
+// Function to convert std::wstring to UTF-8 std::string
+std::string wstring_to_utf8(const std::wstring& wstr) {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    return converter.to_bytes(wstr);
+}
+
+void PrintWebSearch(std::wstring searchQuery, DWORD* max_results) {
+    // std::wcout << L"searchQuery: '" << searchQuery << L"'" << std::endl;
+    std::wstring searchUsing;
+    // if the search query is less than 2 characters then return
     if (searchQuery.size() < 2) {
         return;
     }
-    std::string searchQueryStr = wstring_to_string(searchQuery.substr(2));
-    std::string searchUrl;
-    std::string SearchDisplay;
-    // if the first two character is a "g " then it is a google search
+    std::wstring searchQueryStr = searchQuery.substr(2);
+    std::string searchQueryStrUtf8 = wstring_to_utf8(searchQueryStr);
+
+    std::wstring searchUrl;
+    std::wstring SearchDisplay;
+    // if the first two characters are "g " then it is a google search
     if (searchQuery[0] == L'g' && searchQuery[1] == L' ') {
         g_isWebSearch = true;
-        searchUsing = "Search using Google search";
-        searchUrl = "https://www.google.com/search?q=" + searchQueryStr;
+        searchUsing = L"Search using Google search";
+        searchUrl = L"https://www.google.com/search?q=" + searchQueryStr;
 
     } else if (searchQuery[0] == L'y' && searchQuery[1] == L' ') {
         y_isWebSearch = true;
-        searchUsing = "Search using Yahoo search";
-        searchUrl = "https://search.yahoo.com/search?p=" + searchQueryStr;
+        searchUsing = L"Search using Yahoo search";
+        searchUrl = L"https://search.yahoo.com/search?p=" + searchQueryStr;
     } else if (searchQuery[0] == L'b' && searchQuery[1] == L' ') {
         b_isWebSearch = true;
-        searchUsing = "Search using Bing search";
-        searchUrl = "https://www.bing.com/search?q=" + searchQueryStr;
+        searchUsing = L"Search using Bing search";
+        searchUrl = L"https://www.bing.com/search?q=" + searchQueryStr;
     } else if (searchQuery[0] == L'd' && searchQuery[1] == L' ') {
         d_isWebSearch = true;
-        searchUsing = "Search using DuckDuckGo search";
-        searchUrl = "https://duckduckgo.com/?q=" + searchQueryStr;
+        searchUsing = L"Search using DuckDuckGo search";
+        searchUrl = L"https://duckduckgo.com/?q=" + searchQueryStr;
     } else if (searchQuery[0] == L'w' && searchQuery[1] == L' ') {
         w_isWebSearch = true;
-        searchUsing = "Search using Wikipedia search";
-        searchUrl = "https://en.wikipedia.org/wiki/" + searchQueryStr;
+        searchUsing = L"Search using Wikipedia search";
+        searchUrl = L"https://en.wikipedia.org/wiki/" + searchQueryStr;
     }
     
     if (g_isWebSearch || y_isWebSearch || b_isWebSearch || d_isWebSearch || w_isWebSearch) {
         makeReply(
-            searchUrl,
-            searchUsing,
+            wstring_to_utf8(searchUrl),
+            wstring_to_utf8(searchUsing),
             Type::Web,
-            searchQueryStr == "" ? "Type something to search.." : searchQueryStr,
-            searchUsing
+            searchQueryStrUtf8.empty() ? "Type something to search.." : "'" + searchQueryStrUtf8 + "'",
+            wstring_to_utf8(searchUsing)
         );
+
+        if (*max_results == 1) {
+            *max_results = 0;
+        }
     }
 }
-
 int main(int argc, char** argv) {
     if (argc < 3) {
         std::cerr << "Usage: jseek [maxResults] [searchQuery...]\n";
@@ -135,7 +148,11 @@ int main(int argc, char** argv) {
 
     std::wstring searchQuery = CharToLPCWSTR(tmp_searchQuery);
 
-    PrintWebSearch(searchQuery);
+    PrintWebSearch(searchQuery, &max_results);
+
+    if (max_results == 0) {
+        return 0;
+    }
     // return 0;
 
     Everything_SetSearchW(searchQuery.c_str());
