@@ -11,7 +11,12 @@
 <body>
     <div id="container">
         <div id="search">
-            <img src="search.svg">
+            <div class="search-wrapper">
+                <div class="search-loader">
+                    <div class="search__circle"></div>
+                    <div class="search__rectangle"></div>
+                </div>
+            </div>
             <div class="input-container">
                 <div id="highlight-key"></div>
                 <input type="text" id="input" class="input-field" placeholder="Start Typing..."/>
@@ -29,9 +34,6 @@
         </div>
         <div id="search-button-container">
             <button id="search-button" class="hidden">Search</button>
-        </div>
-        <div id="loading">
-            <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
         </div>
         <div id="results">
             <!-- <div class="block" onclick="openFile()">

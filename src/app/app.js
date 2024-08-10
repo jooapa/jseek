@@ -159,24 +159,8 @@ document.getElementById("input").addEventListener("input", (event) => {
 });
 
 function gettingResultsLoading() {
-    // <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-
-    const loadingDiv = document.getElementById("loading");
-
-    // if already child, return
-    if (loadingDiv.childElementCount > 0) {
-        return;
-    }
-
-    // add the div inside the loadingDiv
-    const div = document.createElement("div");
-    div.classList.add("lds-ellipsis");
-    for (let i = 0; i < 4; i++) {
-        const childDiv = document.createElement("div");
-        div.appendChild(childDiv);
-    }
-    loadingDiv.appendChild(div);
-    
+    // add to .search-loader loading class
+    document.getElementsByClassName("search-loader")[0].classList.add("loading");    
 }
 
 function isValidnonModidyInputchar(input) {
@@ -311,7 +295,7 @@ function setResults(result) {
         console.log(results);
         updateSelectedResult()
 
-        document.getElementById("loading").innerHTML = "";
+        document.getElementsByClassName("search-loader")[0].classList.remove("loading");
     }
 }
 
