@@ -1,15 +1,18 @@
 const { ipcRenderer } = require('electron');
 const {
     Keywords,
+    contructBlock,
 } = require('../config');
 
 let debounceTimeoutFirst;
 let debounceTimeoutSecond;
-let debounceTimeoutThird;
 
 let selectedResult = 0;
 let results = [];
-        
+
+// permaResults is block with .perma
+let permaResults = [];
+
 function escapeHtml(text) {
     if (typeof text !== 'string') {
         text = String(text);
@@ -100,6 +103,59 @@ function fuzzySearchHighlight(text) {
     return [highlightedText, intiFact];
 }
 
+function checkForConstantResults(input) {
+    // search
+    let searchUsing;
+    let searchUrl;
+    let inputNew = input.substring(2);
+
+    if (input.startsWith("g ")) {
+        searchUsing = "Search using Google search";
+        searchUrl = "https://www.google.com/search?q=" + inputNew;
+    } else if (input.startsWith("y ")) {
+        searchUsing = "Search using Youtube search";
+        searchUrl = "https://www.youtube.com/results?search_query=" + inputNew;
+    } else if (input.startsWith("d ")) {
+        searchUsing = "Search using DuckDuckGo search";
+        searchUrl = "https://duckduckgo.com/?q=" + inputNew;
+    } else if (input.startsWith("b ")) {
+        searchUsing = "Search using Bing search";
+        searchUrl = "https://www.bing.com/search?q=" + inputNew;
+    } else if (input.startsWith("w ")) {
+        searchUsing = "Search using Wikipedia search";
+        searchUrl = "https://en.wikipedia.org/wiki/Special:Search?search=" + inputNew;
+    }
+
+    if (searchUsing !== undefined) {
+            const searchDiv = contructBlock(
+            searchUrl,
+            searchUsing,
+            "Web",
+            searchUsing == " " ? "Type something to search.." : "'" + inputNew + "'",
+            searchUsing,
+            input,
+            true
+        );
+        
+        setPermaResults(searchDiv);
+    }
+}
+
+function resetPermaResults() {
+    const permaResults = document.getElementsByClassName("perma");
+    for (let i = 0; i < permaResults.length; i++) {
+        permaResults[i].remove();
+    }
+}
+
+function setPermaResults(divs) {
+    resetPermaResults();
+    const permaResults = document.getElementsByClassName("perma");
+    if (permaResults.length == 0) {
+        document.getElementById("results").insertAdjacentHTML("beforeend", divs);
+    }
+}
+
 document.getElementById("input").addEventListener("input", (event) => {
     const input = event.target;
     
@@ -111,22 +167,18 @@ document.getElementById("input").addEventListener("input", (event) => {
         return;
     }
 
+    checkForConstantResults(input.value);
+
     clearTimeout(debounceTimeoutFirst);
     debounceTimeoutFirst = setTimeout(async () => {
         if (input.value.length === 0) {
             resetResults();
             return;
         }
-        gettingResultsLoading()
+        startLoading()
         let newResults = await callSearch(1, input.value);
 
         setResults(newResults[0]);
-        // if (newResults[1] === "No results") {
-        //     clearTimeout(debounceTimeoutFirst);
-        //     clearTimeout(debounceTimeoutSecond);
-        //     clearTimeout(debounceTimeoutThird);
-        //     return;
-        // }
     }, 69);
 
     clearTimeout(debounceTimeoutSecond);
@@ -135,32 +187,20 @@ document.getElementById("input").addEventListener("input", (event) => {
             resetResults();
             return;
         }
-        gettingResultsLoading()
-        let newResults = await callSearch(2, input.value);
+        startLoading()
+        let newResults = await callSearch(5, input.value);
         setResults(newResults[0]);
-        // if (newResults[1] === "No results") {
-        //     clearTimeout(debounceTimeoutFirst);
-        //     clearTimeout(debounceTimeoutSecond);
-        //     clearTimeout(debounceTimeoutThird);
-        //     return;
-        // }
     }, 300);
-
-    // clearTimeout(debounceTimeoutThird);
-    // debounceTimeoutThird = setTimeout(async () => {
-    //     if (input.value.length === 0) {
-    //         resetResults();
-    //         return;
-    //     }
-    //     gettingResultsLoading()
-    //     let newResults = await callSearch(10, input.value);
-    //     setResults(newResults[0]);
-    // }, 1000);
 });
 
-function gettingResultsLoading() {
+function startLoading() {
     // add to .search-loader loading class
     document.getElementsByClassName("search-loader")[0].classList.add("loading");    
+}
+
+function stopLoading() {
+    // remove from .search-loader loading class
+    document.getElementsByClassName("search-loader")[0].classList.remove("loading");
 }
 
 function isValidnonModidyInputchar(input) {
@@ -220,16 +260,14 @@ document.addEventListener('keydown', function(event) {
             return;
         }
 
-
-        // simulate click
-        // if (selectedResult === blocks.length - 1) {
-        //     moreResults();
-        //     return;
-        // }
-
         const block = blocks[selectedResult];
         const path = block.getAttribute("data-path");
         const type = block.getAttribute("data-type");
+        
+        if (block.id === "more") {
+            moreResults();
+            return;
+        }
 
         // if shift is pressed, open the file in the explorer
         if (event.ctrlKey) {
@@ -289,19 +327,29 @@ function maybeResetResults() {
 
 function setResults(result) {
     if (!maybeResetResults()) {
-        document.getElementById("results").innerHTML = result;
+        // remove every children of results that doesnt have perma class
+        const results = document.getElementById("results");
+        const children = results.children;
+        for (let i = 0; i < children.length; i++) {
+            if (!children[i].classList.contains("perma")) {
+                children[i].remove();
+            }
+        }
+        
+        // add the new results
+        results.insertAdjacentHTML("beforeend", result);
+
         // calculate the number of results
         results = document.getElementById("results").getElementsByClassName("block");
-        console.log(results);
         updateSelectedResult()
 
-        document.getElementsByClassName("search-loader")[0].classList.remove("loading");
+        stopLoading();
     }
 }
 
 function resetResults() {
     document.getElementById("results").innerHTML = "";
-    document.getElementById("loading").innerHTML = "";
+    stopLoading();
 }
 
 function openFile(path, type, explorer = false) {
@@ -326,7 +374,7 @@ function openFile(path, type, explorer = false) {
 
 // called when the user clicks the "more results" button in the html
 async function moreResults() {
-    gettingResultsLoading();
+    startLoading();
     // 50 more results
     
     let moreResults = results.length + 50;
@@ -341,7 +389,7 @@ async function moreResults() {
 // "No results"
 // "More results"
 async function callSearch(amount, query) {
-    gettingResultsLoading();
+    startLoading();
     const result = await ipcRenderer.invoke('search-query', amount + ' "' + query + '"');
     return result;
 }

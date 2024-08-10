@@ -29,42 +29,38 @@ enum class Type {
 
 // Example output for one search result:
 // C:\Users\user\Documents\file.txt|file.txt|Type|Display Name|Info Name\n
-void makeReply(std::string path, std::string name, Type type, std::string displayName, std::string infoName) {
-    std::string reply = 
+void makeReply(std::wstring path, std::wstring name, Type type, std::wstring displayName, std::wstring infoName) {
+    std::wstring reply = 
         path 
-    + "|" + 
+    + L"|" + 
         name 
-    + "|" + 
+    + L"|" + 
         (type == 
-        Type::File ? "File" : 
-        type == Type::Folder    ? "Folder" : 
-        type == Type::Volume    ? "Volume" : 
-        type == Type::Web       ? "Web" : 
-        type == Type::Other     ? "Other" : 
-        "Unknown"
+        Type::File ? L"File" : 
+        type == Type::Folder    ? L"Folder" : 
+        type == Type::Volume    ? L"Volume" : 
+        type == Type::Web       ? L"Web" : 
+        type == Type::Other     ? L"Other" : 
+        L"Unknown"
         ) 
-    + "|" + 
+    + L"|" + 
         displayName 
-    + "|" + 
+    + L"|" + 
         infoName 
-    + "\n";
+    + L"\n";
 
-    std::cout << reply;
-}
-// Function to convert std::wstring to std::string
-std::string wstring_to_string(const std::wstring& wstr) {
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-    return converter.to_bytes(wstr);
+    std::wcout << reply;
 }
 
 std::wstring CharToLPCWSTR(const std::string& charArray) {
-    try {
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-        return converter.from_bytes(charArray);
-    } catch (const std::range_error& e) {
-        std::cerr << "Conversion error: " << e.what() << std::endl;
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, charArray.c_str(), (int)charArray.size(), NULL, 0);
+    if (size_needed == 0) {
+        std::cerr << "Conversion error: MultiByteToWideChar failed" << std::endl;
         return L""; // Return an empty wide string on error
     }
+    std::wstring wstrTo(size_needed, 0);
+    MultiByteToWideChar(CP_UTF8, 0, charArray.c_str(), (int)charArray.size(), &wstrTo[0], size_needed);
+    return wstrTo;
 }
 
 bool g_isWebSearch = false;
@@ -72,7 +68,6 @@ bool y_isWebSearch = false;
 bool b_isWebSearch = false;
 bool d_isWebSearch = false;
 bool w_isWebSearch = false;
-
 
 // Function to convert std::wstring to UTF-8 std::string
 std::string wstring_to_utf8(const std::wstring& wstr) {
@@ -88,7 +83,6 @@ void PrintWebSearch(std::wstring searchQuery, DWORD* max_results) {
         return;
     }
     std::wstring searchQueryStr = searchQuery.substr(2);
-    std::string searchQueryStrUtf8 = wstring_to_utf8(searchQueryStr);
 
     std::wstring searchUrl;
     std::wstring SearchDisplay;
@@ -118,11 +112,11 @@ void PrintWebSearch(std::wstring searchQuery, DWORD* max_results) {
     
     if (g_isWebSearch || y_isWebSearch || b_isWebSearch || d_isWebSearch || w_isWebSearch) {
         makeReply(
-            wstring_to_utf8(searchUrl),
-            wstring_to_utf8(searchUsing),
+            searchUrl,
+            searchUsing,
             Type::Web,
-            searchQueryStrUtf8.empty() ? "Type something to search.." : "'" + searchQueryStrUtf8 + "'",
-            wstring_to_utf8(searchUsing)
+            searchQueryStr == std::wstring(L"") ? L"Type something to search.." : L"'" + searchQueryStr + L"'",
+            searchUsing
         );
 
         if (*max_results == 1) {
@@ -130,6 +124,7 @@ void PrintWebSearch(std::wstring searchQuery, DWORD* max_results) {
         }
     }
 }
+
 int main(int argc, char** argv) {
     if (argc < 3) {
         std::cerr << "Usage: jseek [maxResults] [searchQuery...]\n";
@@ -138,21 +133,21 @@ int main(int argc, char** argv) {
 
     DWORD max_results = std::stoul(argv[1]);
 
-    std::string tmp_searchQuery;
+    std::wstring tmp_searchQuery;
     for (int i = 2; i < argc; ++i) {
-        tmp_searchQuery += argv[i];
+        tmp_searchQuery += CharToLPCWSTR(argv[i]);
         if (i < argc - 1) {
-            tmp_searchQuery += " ";
+            tmp_searchQuery += L" ";
         }
     }
 
-    std::wstring searchQuery = CharToLPCWSTR(tmp_searchQuery);
+    std::wstring searchQuery = tmp_searchQuery;
 
-    PrintWebSearch(searchQuery, &max_results);
+    // PrintWebSearch(searchQuery, &max_results);
 
-    if (max_results == 0) {
-        return 0;
-    }
+    // if (max_results == 0) {
+    //     return 0;
+    // }
     // return 0;
 
     Everything_SetSearchW(searchQuery.c_str());
@@ -191,25 +186,13 @@ int main(int argc, char** argv) {
             } else {
                 fullFilePath = std::wstring(resultPath) + L"\\" + resultFileName;
             }
-    
-            // std::wcout << 
-            //     fullFilePath 
-            // << L"|" << 
-            //     resultFileName 
-            // << L"|" << 
-            //     type 
-            // << L"|" <<
-            //     resultFileName 
-            // << L"|" <<
-            //     fullFilePath
-            // << L"\n";
 
             makeReply(
-                wstring_to_string(fullFilePath),
-                wstring_to_string(resultFileName),
+                fullFilePath,
+                resultFileName,
                 type,
-                wstring_to_string(resultFileName),
-                wstring_to_string(fullFilePath)
+                resultFileName,
+                fullFilePath
             );
     
         }

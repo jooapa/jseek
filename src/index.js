@@ -16,6 +16,9 @@ const {
     trySearch,
 } = require('./actions');
 
+const {
+    contructBlock,
+} = require('./config');
 
 app.on('ready', createWindow);
 
@@ -80,21 +83,8 @@ function makeReply(reply, originalQuery) {
         }
         file = file.substring(0, file.length - 1);
         let [path, name, type, displayName, infoName] = file.split('|');
-
-        let betterPath = path.replace(/\\/g, '\\\\');
-        let idName = "block";
-        if (type === "Web") {
-            idName = "web";
-        }
-
-        result += 
-        `<div id="${idName}" class="block" data-type="${type}" data-path="${path}" onclick="openFile('${betterPath}', '${type}')">
-            <img src="image1.jpg">
-            <div class="info">
-                <h2 class="name">${highlightResults(displayName, originalQuery)}</h2>
-                <p class="path">${highlightResults(infoName, originalQuery)}</p>
-            </div>
-        </div>`;
+        
+        result += contructBlock(path, name, type, displayName, infoName, originalQuery, false);
     });
 
     isWeb = files[0].split('|')[2] === "Web";
@@ -125,30 +115,4 @@ function makeReply(reply, originalQuery) {
     console.log("-------------------------------");
 
     return [result, whatType];
-}
-
-
-
-function highlightResults(input, highlight) {
-    // find highlight in input and wrap it in <span class="highlight"> tags
-    // return the modified input
-
-    // hightlight example: "num query going here"
-    // remove the number from the start
-
-    highlight = highlight.substring(highlight.indexOf(' ') + 1);
-
-    if (!input || !highlight) {
-        return input;
-    }
-
-    // Escape special characters in the highlight string to safely use it in regex
-    const escapeRegExp = (string) => {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    };
-
-    const escapedHighlight = escapeRegExp(highlight);
-    const regex = new RegExp(`(${escapedHighlight})`, 'gi');
-
-    return input.replace(regex, '<span class="highlight">$1</span>');
 }

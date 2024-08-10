@@ -428,7 +428,54 @@ const DateInfo = [
     datemodified:today`,
 ]
 
+function highlightResults(input, highlight) {
+    // find highlight in input and wrap it in <span class="highlight"> tags
+    // return the modified input
+
+    // hightlight example: "num query going here"
+    // remove the number from the start
+
+    highlight = highlight.substring(highlight.indexOf(' ') + 1);
+
+    if (!input || !highlight) {
+        return input;
+    }
+
+    // Escape special characters in the highlight string to safely use it in regex
+    const escapeRegExp = (string) => {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    };
+
+    const escapedHighlight = escapeRegExp(highlight);
+    const regex = new RegExp(`(${escapedHighlight})`, 'gi');
+
+    return input.replace(regex, '<span class="highlight">$1</span>');
+}
+
+function contructBlock(path, name, type, displayName, infoName, originalQuery, isPerma) {
+    let betterPath = path.replace(/\\/g, '\\\\');
+    let idName = "block";
+    if (type === "Web") {
+        idName = "web";
+    }
+    let perma
+    if (isPerma) {
+        perma = "perma";
+    }
+
+    return `<div id="${idName}" class="block ${perma}" data-type="${type}" data-path="${path}" onclick="openFile('${betterPath}', '${type}')">
+        <img src="image1.jpg">
+        <div class="info">
+            <h2 class="name">${highlightResults(displayName, originalQuery)}</h2>
+            <p class="path">${highlightResults(infoName, originalQuery)}</p>
+        </div>
+    </div>`;
+}
+
 module.exports = {
     debug,
     Keywords,
+    SizeInfo,
+    DateInfo,
+    contructBlock
 };
