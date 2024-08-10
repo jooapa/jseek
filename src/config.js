@@ -9,53 +9,61 @@ const Keywords = [
     // ],
     
     // Start commands
+    // [
+    //     ['>'],
+    //     ['Run a command'],
+    //     ["intensity", -1],
+    //     ["start", true],
+    //     ["startSpaceMatters", false],
+    // ],
     [
-        ['>'],
-        ['Run a command'],
-        ["intensity", -1],
-        ["start", true],
-    ],
-    [
-        ['@'],
+        ['!'],
         ['Search for files From the Recent Files'],
         ["intensity", -1],
         ["start", true],
+        ["startSpaceMatters", false],
     ],
     [
-        ['g '],
+        ['g'],
         ['Search for web using Google'],
         ["intensity", -1],
         ["start", true],
+        ["startSpaceMatters", true],
     ],
     [
-        ['y '],
+        ['y'],
         ['Search for web using Yahoo'],
         ["intensity", -1],
         ["start", true],
+        ["startSpaceMatters", true],
     ],
     [
-        ['b '],
+        ['b'],
         ['Search for web using Bing'],
         ["intensity", -1],
         ["start", true],
+        ["startSpaceMatters", true],
     ],
     [
-        ['d '],
+        ['d'],
         ['Search for web using DuckDuckGo'],
         ["intensity", -1],
         ["start", true],
+        ["startSpaceMatters", true],
     ],
     [
-        ['w '],
+        ['w'],
         ['Search for web using Wikipedia'],
         ["intensity", -1],
         ["start", true],
+        ["startSpaceMatters", true],
     ],
     [
         ['?'],
         ['Search for web using default search engine and browser'],
         ["intensity", -1],
         ["start", true],
+        ["startSpaceMatters", false],
     ],
 
     [

@@ -43,7 +43,7 @@ function fuzzySearchHighlight(text) {
         const description = keywords[i][1];
         const intensity = keywords[i][2];
         const start = keywords[i][3];
-        
+        const startSpaceMatters = keywords[i][4];
 
         let intensityKey;
         if (intensity[1] === 0) {
@@ -61,10 +61,14 @@ function fuzzySearchHighlight(text) {
         for (let j = 0; j < keywordArray.length; j++) {
             const keyword = keywordArray[j];
             const escapedKeyword = escapeHtml(keyword);
-            
             if (start) {
+                let regex;
                 // match the start of the string until the first space
-                const regex = new RegExp(`^${escapeRegExp(escapedKeyword)}`, "gi");
+                if (startSpaceMatters) {
+                    regex = new RegExp(`^${escapeRegExp(escapedKeyword)}(?=\\s)`, "gi");
+                } else {
+                    regex = new RegExp(`^${escapeRegExp(escapedKeyword)}`, "gi");
+                }
                 const match = escapedText.match(regex);
                 if (match) {
                     Intensities.push(intensity[1]);
@@ -155,36 +159,24 @@ document.getElementById("input").addEventListener("input", (event) => {
 });
 
 function gettingResultsLoading() {
-    //         <div class="getting">
-    //             <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-    //         </div>
+    // <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
 
-    // add loading div between </div> and <button class="block" onclick="moreResults()">
-    // let noBLocks = false;
+    const loadingDiv = document.getElementById("loading");
 
-    // const results = document.getElementById("results");
-    // const blocks = results.getElementsByClassName("block");
-    // if (blocks.length === 0) {
-    //     noBLocks = true;
-    // }
+    // if already child, return
+    if (loadingDiv.childElementCount > 0) {
+        return;
+    }
 
-    // // if already exists, remove it
-    // const existingLoadingDiv = results.getElementsByClassName("getting");
-    // if (existingLoadingDiv.length > 0) {
-    //     existingLoadingDiv[0].remove();
-    // }
-
-    // const lastBlock = blocks[blocks.length - 1];
-    // const loadingDiv = document.createElement("div");
-    // loadingDiv.classList.add("getting");
-    // loadingDiv.innerHTML = `<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>`;
-    // if (!noBLocks && !lastBlock.classList.contains("block-web")) {
-    //     results.insertBefore(loadingDiv, lastBlock);
-    // } else {
-    //     results.appendChild(loadingDiv);
-    // }
-    // scroll to the bottom
-    // results.scrollTop = results.scrollHeight;
+    // add the div inside the loadingDiv
+    const div = document.createElement("div");
+    div.classList.add("lds-ellipsis");
+    for (let i = 0; i < 4; i++) {
+        const childDiv = document.createElement("div");
+        div.appendChild(childDiv);
+    }
+    loadingDiv.appendChild(div);
+    
 }
 
 function isValidnonModidyInputchar(input) {
@@ -270,7 +262,7 @@ document.addEventListener('keydown', function(event) {
     }
 
     if (isValidCharInput(event)) {
-        resetResults();
+        // resetResults();
         selectedResult = 0;
         inputElem.focus();
         // inputElem.setSelectionRange(inputElem.value.length, inputElem.value.length);
@@ -318,11 +310,14 @@ function setResults(result) {
         results = document.getElementById("results").getElementsByClassName("block");
         console.log(results);
         updateSelectedResult()
+
+        document.getElementById("loading").innerHTML = "";
     }
 }
 
 function resetResults() {
     document.getElementById("results").innerHTML = "";
+    document.getElementById("loading").innerHTML = "";
 }
 
 function openFile(path, type, explorer = false) {
@@ -345,6 +340,7 @@ function openFile(path, type, explorer = false) {
     }
 }
 
+// called when the user clicks the "more results" button in the html
 async function moreResults() {
     gettingResultsLoading();
     // 50 more results
