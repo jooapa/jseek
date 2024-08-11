@@ -72,7 +72,10 @@ function makeReply(reply, originalQuery) {
     
     /// Example reply: "C:\Users\user\Documents\file.txt|file.txt|File|Display Name|Info Name\n"
     // split by ":" 
-    
+    if (reply.length === 0) {
+        return ["", "No results"];
+    }
+
     let result = '';
     let files = reply.split('\n');
     // remove the last empty string
@@ -95,10 +98,6 @@ function makeReply(reply, originalQuery) {
     }
 
     if (files.length === 0) {
-        result += 
-        `<div class="greeting">
-            <h2>No results found</h2>
-        </div>`;
         whatType = "No results";
     } else {
         result += 

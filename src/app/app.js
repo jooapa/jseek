@@ -131,14 +131,21 @@ function checkForConstantResults(input) {
             searchUrl,
             searchUsing,
             "Web",
-            searchUsing == " " ? "Type something to search.." : "'" + inputNew + "'",
+            inputNew == !isEmptyOrSpaces(inputNew) ? "Type something to search.." : "'" + inputNew + "'",
             searchUsing,
             input,
             true
         );
         
         setPermaResults(searchDiv);
+    } else {
+        resetPermaResults();
     }
+}
+
+// https://stackoverflow.com/questions/10232366/how-to-check-if-a-variable-is-null-or-empty-string-or-all-whitespace-in-javascri
+function isEmptyOrSpaces(str){
+    return str === null || str.match(/^ *$/) !== null;
 }
 
 function resetPermaResults() {
@@ -146,14 +153,14 @@ function resetPermaResults() {
     for (let i = 0; i < permaResults.length; i++) {
         permaResults[i].remove();
     }
+    permaResults.length = 0;
 }
 
 function setPermaResults(divs) {
+    // replace the perma results with the new one
     resetPermaResults();
-    const permaResults = document.getElementsByClassName("perma");
-    if (permaResults.length == 0) {
-        document.getElementById("results").insertAdjacentHTML("beforeend", divs);
-    }
+    document.getElementById("results").insertAdjacentHTML("afterbegin", divs);
+    permaResults = document.getElementById("results").getElementsByClassName("block");
 }
 
 document.getElementById("input").addEventListener("input", (event) => {
@@ -161,12 +168,12 @@ document.getElementById("input").addEventListener("input", (event) => {
     
     const highlighted = fuzzySearchHighlight(input.value);
     document.getElementById('highlight-key').innerHTML = highlighted[0];
-
+    
     if (highlighted[1] === "Slow") {
         setResults("SLOW");
         return;
     }
-
+    
     checkForConstantResults(input.value);
 
     clearTimeout(debounceTimeoutFirst);
@@ -175,10 +182,9 @@ document.getElementById("input").addEventListener("input", (event) => {
             resetResults();
             return;
         }
-        startLoading()
         let newResults = await callSearch(1, input.value);
 
-        setResults(newResults[0]);
+        setResults(newResults);
     }, 69);
 
     clearTimeout(debounceTimeoutSecond);
@@ -187,9 +193,8 @@ document.getElementById("input").addEventListener("input", (event) => {
             resetResults();
             return;
         }
-        startLoading()
         let newResults = await callSearch(5, input.value);
-        setResults(newResults[0]);
+        setResults(newResults);
     }, 300);
 });
 
@@ -318,7 +323,8 @@ function updateSelectedResult() {
 }
 
 function maybeResetResults() {
-    if (document.getElementById("input").value.length === 0) {
+    if (document.getElementById("input").value.length === 0
+    ) {
         resetResults();
         return true;
     }
@@ -326,25 +332,39 @@ function maybeResetResults() {
 }
 
 function setResults(result) {
-    if (!maybeResetResults()) {
-        // remove every children of results that doesnt have perma class
-        const results = document.getElementById("results");
-        const children = results.children;
-        for (let i = 0; i < children.length; i++) {
-            if (!children[i].classList.contains("perma")) {
-                children[i].remove();
-            }
-        }
-        
-        // add the new results
-        results.insertAdjacentHTML("beforeend", result);
+    const resultsdiv = document.getElementById("results");
+    // remove every children of results that doesnt have perma class
+    document.querySelectorAll('.block:not(.perma)').forEach(e => e.remove());
+    document.querySelectorAll('#more').forEach(e => e.remove());
+    document.querySelectorAll('#no-results').forEach(e => e.remove());
 
-        // calculate the number of results
+    // resetResults()
+    if (result[1] === "No results") {
+        resultsdiv.insertAdjacentHTML("beforeend",
+        `<div id="no-results">
+                <p>No results found</p>
+            </div>`
+        );
         results = document.getElementById("results").getElementsByClassName("block");
-        updateSelectedResult()
-
         stopLoading();
+        return;
     }
+
+
+    if (result[0] === undefined) {
+        return;
+    }
+
+    
+    // add the new results
+    resultsdiv.insertAdjacentHTML("beforeend", result[0]);
+
+    // calculate the number of results
+    results = document.getElementById("results").getElementsByClassName("block");
+    updateSelectedResult()
+
+    stopLoading();
+    
 }
 
 function resetResults() {
@@ -374,13 +394,12 @@ function openFile(path, type, explorer = false) {
 
 // called when the user clicks the "more results" button in the html
 async function moreResults() {
-    startLoading();
     // 50 more results
     
     let moreResults = results.length + 50;
     let newResults = await callSearch(moreResults, document.getElementById("input").value);
     
-    setResults(newResults[0]);
+    setResults(newResults);
 }
 
 // returns array, where [0] is the result and [1] is the type of the result

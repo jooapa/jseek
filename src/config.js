@@ -458,12 +458,12 @@ function contructBlock(path, name, type, displayName, infoName, originalQuery, i
     if (type === "Web") {
         idName = "web";
     }
-    let perma
+    let perma = "";
     if (isPerma) {
-        perma = "perma";
+        perma = " perma";
     }
 
-    return `<div id="${idName}" class="block ${perma}" data-type="${type}" data-path="${path}" onclick="openFile('${betterPath}', '${type}')">
+    return `<div id="${idName}" class="block${perma}" data-type="${type}" data-path="${path}" onclick="openFile('${betterPath}', '${type}')">
         <img src="image1.jpg">
         <div class="info">
             <h2 class="name">${highlightResults(displayName, originalQuery)}</h2>
