@@ -12,7 +12,7 @@ You can search for anything, you can filter results, using following keywords:
 - **`size:<>`** Search for files with size
 - [And more...](./src/config.js)
 
-- [ ] **`$<>`** Search programs in PATH, Start Menu..
+- [ ] **`,<>`** Search programs in PATH, Start Menu..
   - All the path where the programs exe or shortcut is located
     - **`%PATH%`** Search in PATH
     - **`C:\Users\%USERNAME%\AppData\Roaming\Microsoft\Windows\Start Menu`** Search in Start Menu
@@ -20,18 +20,15 @@ You can search for anything, you can filter results, using following keywords:
 - [ ] **`eg. 1(2+4)`** Calculate math expression
   - **`eg. 1(2+4) -> [hex|bin|oct]`** Convert math expression to hex, bin, oct
   - **`[hex|bin|oct] -> [hex|bin|oct|dec]`** Convert number to hex, bin, oct, dec
-- [ ] Web search
-  - **`?<>`** Search for web using default search engine and browser
-    - **`g<>`** Search for web using Google
-    - **`y<>`** Search for web using Yahoo
-    - **`b<>`** Search for web using Bing
-    - **`d<>`** Search for web using DuckDuckGo
-    - **`?w<>`** Search for web using Wikipedia
+- [x] Web search
+  - **`g <>`** Search for web using Google
+  - **`y <>`** Search for web using Yahoo
+  - **`b <>`** Search for web using Bing
+  - **`d <>`** Search for web using DuckDuckGo
+  - **`w <>`** Search for web using Wikipedia
 - [ ] **`><>`** Run command
   - **`><>!`** Run command in elevated mode
-  - **`><>~`** Run command in hidden mode
-  - **`><>~!`** Run command in hidden mode in elevated mode
-- [ ] **`@<>`** Recent files search
+- [ ] **`#<>`** Search for the Recent files
   - **`C:\Users\%USERNAME%\AppData\Roaming\Microsoft\Windows\Recent`** Search in Recent
 
 Without adding any keyword, it will search for the best match.

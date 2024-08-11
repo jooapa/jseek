@@ -458,7 +458,9 @@ function highlightResults(input, highlight) {
 }
 
 function contructBlock(path, name, type, displayName, infoName, originalQuery, isPerma) {
-    let betterPath = path.replace(/\\/g, '\\\\').replace(/"/g, '&quot;');
+    console.log("path: ", path);
+    let betterPath = path.replace(/"/g, '&quot;');
+    console.log("betterPath: ", betterPath);
     let escapedType = type.replace(/"/g, '&quot;');
     let escapedDisplayName = displayName.replace(/"/g, '&quot;');
     let escapedInfoName = infoName.replace(/"/g, '&quot;');

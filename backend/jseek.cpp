@@ -18,9 +18,6 @@
 #include <shellapi.h>
 #include <gdiplus.h>
 #include <iomanip>
-#include <io.h>
-#include <fcntl.h>
-#include <stdio.h>
 
 enum class Type {
     File,
@@ -129,9 +126,6 @@ void PrintWebSearch(std::wstring searchQuery, DWORD* max_results) {
 }
 
 int main(int argc, char** argv) {
-    _setmode(_fileno(stdout), _O_U16TEXT); // <=== Windows madness
-    puts("\302\260"); 
-    
     if (argc < 3) {
         std::cerr << "Usage: jseek [maxResults] [searchQuery...]\n";
         return 1;
