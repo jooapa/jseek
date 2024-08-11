@@ -354,6 +354,11 @@ const Keywords = [
         ["intensity", 0],
     ],
     [
+        ['count:'],
+        ['Search for files and folders with the specified file count.'],
+        ["intensity", 0],
+    ],
+    [
         ['runcount:'],
         ['Search for files and folders with the specified run count.'],
         ["intensity", 0],
@@ -453,7 +458,12 @@ function highlightResults(input, highlight) {
 }
 
 function contructBlock(path, name, type, displayName, infoName, originalQuery, isPerma) {
-    let betterPath = path.replace(/\\/g, '\\\\');
+    let betterPath = path.replace(/\\/g, '\\\\').replace(/"/g, '&quot;');
+    let escapedType = type.replace(/"/g, '&quot;');
+    let escapedDisplayName = displayName.replace(/"/g, '&quot;');
+    let escapedInfoName = infoName.replace(/"/g, '&quot;');
+    let escapedOriginalQuery = originalQuery.replace(/"/g, '&quot;');
+
     let idName = "block";
     if (type === "Web") {
         idName = "web";
@@ -463,11 +473,11 @@ function contructBlock(path, name, type, displayName, infoName, originalQuery, i
         perma = " perma";
     }
 
-    return `<div id="${idName}" class="block${perma}" data-type="${type}" data-path="${path}" onclick="openFile('${betterPath}', '${type}')">
+    return `<div id="${idName}" class="block${perma}" data-type="${escapedType}" data-path="${betterPath}" onclick="openFile('${betterPath}', '${escapedType}')">
         <img src="image1.jpg">
         <div class="info">
-            <h2 class="name">${highlightResults(displayName, originalQuery)}</h2>
-            <p class="path">${highlightResults(infoName, originalQuery)}</p>
+            <h2 class="name"> ${highlightResults(escapedDisplayName, escapedOriginalQuery)} </h2>
+            <p class="path"> ${highlightResults(escapedInfoName, escapedOriginalQuery)} </p>
         </div>
     </div>`;
 }

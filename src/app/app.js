@@ -141,6 +141,8 @@ function checkForConstantResults(input) {
     } else {
         resetPermaResults();
     }
+
+    updateSelectedResult();
 }
 
 // https://stackoverflow.com/questions/10232366/how-to-check-if-a-variable-is-null-or-empty-string-or-all-whitespace-in-javascri
@@ -244,10 +246,13 @@ document.addEventListener('keydown', function(event) {
     }
     if (event.key === "ArrowUp") {
         document.getElementById("input").blur();
-        const length = inputElem.value.length;
-        inputElem.setSelectionRange(length, length);
-        if (selectedResult === 0) {
+        if (selectedResult === 0
+            || results.length === 0
+        ) {
+            const length = inputElem.value.length;
+            inputElem.setSelectionRange(length, length);
             inputElem.focus();
+            event.preventDefault();
         }
 
         if (event.ctrlKey) {
@@ -341,12 +346,13 @@ function setResults(result) {
     // resetResults()
     if (result[1] === "No results") {
         resultsdiv.insertAdjacentHTML("beforeend",
-        `<div id="no-results">
+            `<div id="no-results">
                 <p>No results found</p>
             </div>`
         );
         results = document.getElementById("results").getElementsByClassName("block");
         stopLoading();
+        updateSelectedResult();
         return;
     }
 
