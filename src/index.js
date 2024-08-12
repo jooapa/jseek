@@ -9,7 +9,7 @@ const {
 
 const {
     createWindow,
-    mainWindow,
+    getWindow,
 } = require('./create');
 
 const {
@@ -58,6 +58,14 @@ ipcMain.handle('open-folder', (event, path) => {
 
 ipcMain.handle('open-web', (event, path) => {
     shell.openExternal(path);
+});
+
+ipcMain.handle('open-command', (event, path) => {
+    shell.openPath(path);
+});
+
+ipcMain.handle('close-window', (event) => {
+    getWindow().hide();
 });
 
 function makeReply(reply, originalQuery) {

@@ -8,6 +8,10 @@ const {
 
 let mainWindow;
 
+function getWindow() {
+    return mainWindow;
+}
+
 function createWindow() {
     const currentScreen = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
     const { width, height } = currentScreen.workAreaSize;
@@ -54,9 +58,22 @@ function createWindow() {
     mainWindow.on('closed', function () {
         mainWindow = null;
     });
+
+    mainWindow.on('close', function (event) {
+        if (!app.isQuiting) {
+            event.preventDefault();
+            mainWindow.hide();
+        }
+
+        return false;
+    });
 }
+
+app.on('before-quit', () => {
+    app.isQuiting = true;
+});
 
 module.exports = {
     createWindow,
-    mainWindow,
+    getWindow
 }

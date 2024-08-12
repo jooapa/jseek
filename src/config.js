@@ -433,6 +433,14 @@ const DateInfo = [
     datemodified:today`,
 ]
 
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/ /g, "&nbsp;");
+}
+
 function highlightResults(input, highlight) {
     // find highlight in input and wrap it in <span class="highlight"> tags
     // return the modified input
@@ -478,8 +486,11 @@ function contructBlock(path, name, type, displayName, infoName, originalQuery, i
     return `<div id="${idName}" class="block${perma}" data-type="${escapedType}" data-path="${betterPath}" onclick="openFile('${betterPath}', '${escapedType}')">
         <img src="image1.jpg">
         <div class="info">
-            <h2 class="name"> ${highlightResults(escapedDisplayName, escapedOriginalQuery)} </h2>
-            <p class="path"> ${highlightResults(escapedInfoName, escapedOriginalQuery)} </p>
+            <!-- <h2 class="name"> ${highlightResults(escapedDisplayName, escapedOriginalQuery)} </h2> -->
+            <!-- <p class="path"> ${highlightResults(escapedInfoName, escapedOriginalQuery)} </p> -->
+
+            <h2 class="name"> ${escapeHtml(escapedDisplayName)} </h2>
+            <p class="path"> ${escapeHtml(escapedInfoName)} </p>
         </div>
     </div>`;
 }

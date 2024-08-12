@@ -10,9 +10,6 @@ let debounceTimeoutSecond;
 let selectedResult = 0;
 let results = [];
 
-// permaResults is block with .perma
-let permaResults = [];
-
 function escapeHtml(text) {
     if (typeof text !== 'string') {
         text = String(text);
@@ -103,7 +100,8 @@ function fuzzySearchHighlight(text) {
     return [highlightedText, intiFact];
 }
 
-function checkForConstantResults(input) {
+function checkForSearchResults(input) {
+    let returnVal = false;
     // search
     let searchUsing;
     let searchUrl;
@@ -138,15 +136,50 @@ function checkForConstantResults(input) {
         );
         
         setPermaResults(searchDiv);
+        returnVal = true;
     } else {
         resetPermaResults();
+        returnVal = false;
     }
 
-    updateSelectedResult();
+    return returnVal;
+}
+
+function checkForCommandResults(input) {
+    let returnVal = false;
+    // command >command
+    let commandUsing;
+    let commandUrl;
+    let inputNew = input.substring(1);
+
+    if (input.startsWith(">")) {
+        commandUsing = "Run command";
+        commandUrl = "Run command";
+    }
+
+    if (commandUsing !== undefined) {
+        const commandDiv = contructBlock(
+            inputNew,
+            inputNew,
+            "Command",
+            inputNew == !isEmptyOrSpaces(inputNew) ? "Type something to run command.." : "'" + inputNew + "'",
+            commandUsing,
+            input,
+            true
+        );
+        
+        setPermaResults(commandDiv);
+        returnVal = true;
+    } else {
+        resetPermaResults();
+        returnVal = false;
+    }
+
+    return returnVal;
 }
 
 // https://stackoverflow.com/questions/10232366/how-to-check-if-a-variable-is-null-or-empty-string-or-all-whitespace-in-javascri
-function isEmptyOrSpaces(str){
+function isEmptyOrSpaces(str) {
     return str === null || str.match(/^ *$/) !== null;
 }
 
@@ -176,7 +209,17 @@ document.getElementById("input").addEventListener("input", (event) => {
         return;
     }
     
-    checkForConstantResults(input.value);
+    // this magic if statement checks if the return value is true, 
+    // and if it is, it will continue without the rest functions
+    // if the return value is false, it will continue with the rest of the functions
+    // and it apparenly works ??, not even { } is needed
+    if (
+        checkForSearchResults(input.value)
+        || 
+        checkForCommandResults(input.value)
+    )
+
+    updateSelectedResult();
 
     clearTimeout(debounceTimeoutFirst);
     debounceTimeoutFirst = setTimeout(async () => {
@@ -309,6 +352,10 @@ document.addEventListener('keydown', function(event) {
     maybeResetResults(event);
 });
 
+function closeWindow() {
+    ipcRenderer.invoke('close-window');
+}
+
 function updateSelectedResult() {
     const blocks = document.getElementsByClassName("block");
     if (blocks.length === 0) {
@@ -393,9 +440,14 @@ function openFile(path, type, explorer = false) {
         ipcRenderer.invoke('open-file', path);
     } else if (type === "web") {
         ipcRenderer.invoke('open-web', path);
-    } else {
+    } else if (type === "command") {
+        ipcRenderer.invoke('open-command', path);
+    } 
+    else {
         console.error("Unknown type: " + type);
     }
+
+    closeWindow();
 }
 
 // called when the user clicks the "more results" button in the html
