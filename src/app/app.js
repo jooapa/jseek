@@ -61,10 +61,11 @@ function fuzzySearchHighlight(text) {
         for (let j = 0; j < keywordArray.length; j++) {
             const keyword = keywordArray[j];
             const escapedKeyword = escapeHtml(keyword);
-            if (start) {
+            if (start) { 
                 let regex;
                 // match the start of the string until the first space
                 if (startSpaceMatters) {
+                    // if the keyword is at the start of the string, and the next character is a space
                     regex = new RegExp(`^${escapeRegExp(escapedKeyword)}(?=\\s)`, "gi");
                 } else {
                     regex = new RegExp(`^${escapeRegExp(escapedKeyword)}`, "gi");
