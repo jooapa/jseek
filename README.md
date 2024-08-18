@@ -14,7 +14,7 @@ You can search for anything, you can filter results, using following keywords:
 
 - **`ext:extension`** **`*.<ext>`** Search for files with extension
 - **`size:<>`** Search for files with size
-- [And more...](https://www.voidtools.com/support/everything/searching/)
+- [And more...](https://www.voidtools.com/support/everything/searching/) _Note: Not all features cannot be used in jseek, becase some are really slow and will cause lag_ [The full list of search syntax in jseek](src/config.js)
 
 - Web search
   - **`g <>`** Search for web using Google
