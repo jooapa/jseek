@@ -30,6 +30,25 @@ enum class Type {
 // Example output for one search result:
 // C:\Users\user\Documents\file.txt|file.txt|Type|Display Name|Info Name\n
 void makeReply(std::wstring path, std::wstring name, Type type, std::wstring displayName, std::wstring infoName) {
+    
+    std::wstring imagePath = L"";
+    // make the image path
+    if (type == Type::File) {
+        imagePath = L"assets/file.png";
+    }
+    else if (type == Type::Folder) {
+        imagePath = L"assets/folder.svg";
+    }
+    else if (type == Type::Volume) {
+        imagePath = L"assets/drive.svg";
+    }
+    else if (type == Type::Web) {
+        imagePath = L"assets/web.png";
+    }
+    else {
+        imagePath = L"/assets/file.png";
+    }
+    
     std::wstring reply = 
         path 
     + L"|" + 
@@ -47,6 +66,8 @@ void makeReply(std::wstring path, std::wstring name, Type type, std::wstring dis
         displayName 
     + L"|" + 
         infoName 
+    + L"|" + 
+        imagePath
     + L"\n";
 
     std::wcout << reply;

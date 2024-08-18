@@ -472,7 +472,7 @@ function highlightResults(input, highlight) {
     return input.replace(regex, '<span class="highlight">$1</span>');
 }
 
-function contructBlock(path, name, type, displayName, infoName, originalQuery, isPerma) {
+function contructBlock(path, name, type, displayName, infoName, originalQuery, isPerma, image) {
     console.log("path: ", path);
     let betterPath = path.replace(/"/g, '&quot;');
     console.log("betterPath: ", betterPath);
@@ -491,7 +491,7 @@ function contructBlock(path, name, type, displayName, infoName, originalQuery, i
     }
 
     return `<div id="${idName}" class="block${perma}" data-type="${escapedType}" data-path="${betterPath}" onclick="openFile('${betterPath}', '${escapedType}')">
-        <img src="image1.jpg">
+        <img src="${image}">
         <div class="info">
             <!-- <h2 class="name"> ${highlightResults(escapedDisplayName, escapedOriginalQuery)} </h2> -->
             <!-- <p class="path"> ${highlightResults(escapedInfoName, escapedOriginalQuery)} </p> -->

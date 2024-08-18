@@ -16,7 +16,7 @@ You can search for anything, you can filter results, using following keywords:
 
 - Web search
   - **`g <>`** Search for web using Google
-  - **`y <>`** Search for web using Yahoo
+  - **`y <>`** Make a Youtube search
   - **`b <>`** Search for web using Bing
   - **`d <>`** Search for web using DuckDuckGo
   - **`w <>`** Search for web using Wikipedia

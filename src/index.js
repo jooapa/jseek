@@ -78,7 +78,7 @@ function makeReply(reply, originalQuery) {
     //     </div>
     // </div>
     
-    /// Example reply: "C:\Users\user\Documents\file.txt|file.txt|File|Display Name|Info Name\n"
+    /// Example reply: "C:\Users\user\Documents\file.txt|file.txt|File|Display Name|Info Name|image1.jpg\n"
     // split by ":" 
     if (reply.length === 0) {
         return ["", "No results"];
@@ -93,9 +93,9 @@ function makeReply(reply, originalQuery) {
             return;
         }
         file = file.substring(0, file.length - 1);
-        let [path, name, type, displayName, infoName] = file.split('|');
+        let [path, name, type, displayName, infoName, imagePath] = file.split('|');
         
-        result += contructBlock(path, name, type, displayName, infoName, originalQuery, false);
+        result += contructBlock(path, name, type, displayName, infoName, originalQuery, false, imagePath);
     });
 
     isWeb = files[0].split('|')[2] === "Web";

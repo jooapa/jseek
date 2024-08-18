@@ -104,25 +104,29 @@ function fuzzySearchHighlight(text) {
 function checkForSearchResults(input) {
     let returnVal = false;
     // search
-    let searchUsing;
-    let searchUrl;
+    let searchUsing, searchUrl, searchImage;
     let inputNew = input.substring(2);
 
     if (input.startsWith("g ")) {
         searchUsing = "Search using Google search";
         searchUrl = "https://www.google.com/search?q=" + inputNew;
+        searchImage = "assets/google.png";
     } else if (input.startsWith("y ")) {
         searchUsing = "Search using Youtube search";
         searchUrl = "https://www.youtube.com/results?search_query=" + inputNew;
+        searchImage = "assets/youtube.svg";
     } else if (input.startsWith("d ")) {
         searchUsing = "Search using DuckDuckGo search";
         searchUrl = "https://duckduckgo.com/?q=" + inputNew;
+        searchImage = "assets/duckduckgo.svg";
     } else if (input.startsWith("b ")) {
         searchUsing = "Search using Bing search";
         searchUrl = "https://www.bing.com/search?q=" + inputNew;
+        searchImage = "assets/bing.png";
     } else if (input.startsWith("w ")) {
         searchUsing = "Search using Wikipedia search";
         searchUrl = "https://en.wikipedia.org/wiki/Special:Search?search=" + inputNew;
+        searchImage = "assets/wikipedia.png";
     }
 
     if (searchUsing !== undefined) {
@@ -133,7 +137,8 @@ function checkForSearchResults(input) {
             inputNew == !isEmptyOrSpaces(inputNew) ? "Type something to search.." : "'" + inputNew + "'",
             searchUsing,
             input,
-            true
+            true,
+            searchImage
         );
         
         setPermaResults(searchDiv);
@@ -196,7 +201,7 @@ function setPermaResults(divs) {
     // replace the perma results with the new one
     resetPermaResults();
     document.getElementById("results").insertAdjacentHTML("afterbegin", divs);
-    permaResults = document.getElementById("results").getElementsByClassName("block");
+    document.getElementById("results").getElementsByClassName("block");
 }
 
 document.getElementById("input").addEventListener("input", (event) => {
@@ -427,7 +432,10 @@ function resetResults() {
 }
 
 function openFile(path, type, explorer = false) {
-    type = type.toLowerCase();
+    if (typeof type === 'string') {
+        type = type.toLowerCase();
+    }
+
     if (explorer) {
         if (type === "file") {
             path = path.substring(0, path.lastIndexOf("\\"));
@@ -461,11 +469,17 @@ async function moreResults() {
     setResults(newResults);
 }
 
-// returns array, where [0] is the result and [1] is the type of the result
-// types: 
-// ""
-// "No results"
-// "More results"
+/// returns array, where [0] is the result and [1] is the type of the result
+/**
+ * Calls the search query with the specified amount and query.
+ * @param {number} amount - The amount of search results to retrieve.
+ * @param {string} query - The search query.
+ * @returns {Promise<[string, string]>} - returns array, where [0] is the result and [1] is the type of the result.
+ * TYPES: 
+ * | "" | 
+ * "No results" |
+ * "More results" |
+ */
 async function callSearch(amount, query) {
     startLoading();
     const result = await ipcRenderer.invoke('search-query', amount + ' "' + query + '"');
