@@ -23,7 +23,7 @@ You can search for anything, you can filter results, using following keywords:
   - **`d <>`** Search for web using DuckDuckGo
   - **`w <>`** Search for web using Wikipedia
 - **`><>`** Run command
-  - **`><>!`** Run command in elevated mode
+  - **`><>!`** Run command in elevated mode _**not implemented yet**_
 
 ## coming soon
 
