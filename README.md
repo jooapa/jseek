@@ -9,7 +9,7 @@ jseek is a GUI based search tool, which can search for anything, like files, fol
 You can search for anything, you can filter results, using following keywords:
 
 - **`<anything>`** Search for anything (file, folder, program, web..)
-- **`file:<>`**Search for files
+- **`file:<>`** Search for files
 - **`folder:<>`**  Search for folders
 
 - **`ext:extension`** **`*.<ext>`** Search for files with extension
