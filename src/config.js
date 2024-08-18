@@ -65,6 +65,13 @@ const Keywords = [
         ["start", true],
         ["startSpaceMatters", false],
     ],
+    [
+        ['#'],
+        ['Search for the Recent files'],
+        ["intensity", -1],
+        ["start", true],
+        ["startSpaceMatters", false],
+    ],
 
     [
         ['quot:'],

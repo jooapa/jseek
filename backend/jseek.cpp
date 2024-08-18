@@ -125,36 +125,12 @@ void PrintWebSearch(std::wstring searchQuery, DWORD* max_results) {
     }
 }
 
-int main(int argc, char** argv) {
-    if (argc < 3) {
-        std::cerr << "Usage: jseek [maxResults] [searchQuery...]\n";
-        return 1;
-    }
-
-    DWORD max_results = std::stoul(argv[1]);
-
-    std::wstring tmp_searchQuery;
-    for (int i = 2; i < argc; ++i) {
-        tmp_searchQuery += CharToLPCWSTR(argv[i]);
-        if (i < argc - 1) {
-            tmp_searchQuery += L" ";
-        }
-    }
-
-    std::wstring searchQuery = tmp_searchQuery;
-
-    // PrintWebSearch(searchQuery, &max_results);
-
-    // if (max_results == 0) {
-    //     return 0;
-    // }
-    // return 0;
-
+void ContinueWithEverything(std::wstring searchQuery, DWORD* max_results) {
     Everything_SetSearchW(searchQuery.c_str());
     Everything_SetRequestFlags(EVERYTHING_REQUEST_FILE_NAME | EVERYTHING_REQUEST_PATH | EVERYTHING_REQUEST_DATE_MODIFIED);
     // set the sort to sort by the best match
     Everything_SetSort(EVERYTHING_SORT_DATE_MODIFIED_DESCENDING);
-    Everything_SetMax(max_results);
+    Everything_SetMax(*max_results);
 
     Everything_Query(TRUE);
     
@@ -199,5 +175,31 @@ int main(int argc, char** argv) {
 
     Everything_CleanUp();
 
+}
+
+int main(int argc, char** argv) {
+    if (argc < 3) {
+        std::cerr << "Usage: jseek [maxResults] [searchQuery...]\n";
+        return 1;
+    }
+
+    DWORD max_results = std::stoul(argv[1]);
+
+    std::wstring tmp_searchQuery;
+    for (int i = 2; i < argc; ++i) {
+        tmp_searchQuery += CharToLPCWSTR(argv[i]);
+        if (i < argc - 1) {
+            tmp_searchQuery += L" ";
+        }
+    }
+
+    std::wstring searchQuery = tmp_searchQuery;
+
+    // if the search query is less than 2 characters then return
+    // if (searchQuery.size() < 2) {
+    //     return 0;
+    // }
+
+    ContinueWithEverything(searchQuery, &max_results);
     return 0;
 }
