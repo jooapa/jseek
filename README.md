@@ -1,5 +1,7 @@
 # jseek - search anything
 
+![Preview image of jseek](.github/preview.png)
+
 jseek is a GUI based search tool, which can search for anything, like files, folders, programs, web, etc. It is based on [Everything](https://www.voidtools.com/), so you need to have Everything installed on your system.
 
 ## Searching
