@@ -345,8 +345,7 @@ body {
 #results #more.block.selected,
 #results #more.block:hover {
     transform: scale(1);
-    border-top: 4px solid var(--border-color);
-    padding-top: 0;
+    border-top: 2px solid var(--border-color);
     /* underline color change */
     color: var(--more-color-selected);
     background: linear-gradient(180deg, rgba(101, 127, 245, 0.164) 0%, rgba(0,0,0,0) 100%);

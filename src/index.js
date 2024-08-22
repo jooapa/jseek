@@ -7,6 +7,8 @@ const {
     shell,
 } = require('electron');
 
+const { spawn } = require('child_process');
+
 const {
     createWindow,
     getWindow,
@@ -60,8 +62,28 @@ ipcMain.handle('open-web', (event, path) => {
     shell.openExternal(path);
 });
 
-ipcMain.handle('open-command', (event, path) => {
-    shell.openPath(path);
+ipcMain.handle('open-command', (event, cmd) => {
+    // Split the command and its arguments
+    const [command, ...args] = cmd.split(' ');
+
+    // Construct the full command with arguments
+    const fullCommand = `start cmd.exe /K "${command} ${args.join(' ')}"`;
+
+    // Execute the command in a new terminal window
+    const child = spawn(fullCommand, { shell: true });
+
+    // Handle stdout and stderr
+    child.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`);
+    });
+
+    child.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+    });
+
+    child.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
+    });
 });
 
 ipcMain.handle('close-window', (event) => {
