@@ -1,3 +1,5 @@
+const os = require('os'); // Import the os module
+
 const debug = true;
 
 /// intesity: means how much the macro should be used in the search query, meaning how much it will lag the search
@@ -59,20 +61,17 @@ const Keywords = [
         ["startSpaceMatters", true],
     ],
     [
-        ['?'],
-        ['Search for web using default search engine and browser'],
-        ["intensity", -1],
-        ["start", true],
-        ["startSpaceMatters", false],
-    ],
-    [
-        ['#'],
+        ['#:'],
         ['Search for the Recent files'],
         ["intensity", -1],
         ["start", true],
-        ["startSpaceMatters", false],
     ],
-
+    [
+        ['p:'],
+        ['Search for the programs'],
+        ["intensity", -1],
+        ["start", false],
+    ],
     [
         ['quot:'],
         ['Literal double quote "'],
@@ -502,10 +501,15 @@ function contructBlock(path, name, type, displayName, infoName, originalQuery, i
     </div>`;
 }
 
+function getUsername() {
+    return os.userInfo().username;
+}
+
 module.exports = {
     debug,
     Keywords,
     SizeInfo,
     DateInfo,
-    contructBlock
+    contructBlock,
+    getUsername,
 };

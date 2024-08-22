@@ -2,6 +2,7 @@ const { ipcRenderer } = require('electron');
 const {
     Keywords,
     contructBlock,
+    getUsername,
 } = require('../config');
 
 let debounceTimeoutFirst;
@@ -227,27 +228,39 @@ document.getElementById("input").addEventListener("input", (event) => {
 
     updateSelectedResult();
 
+    // magic input replacement
+    let new_input = magicInputreplacement(input.value);
+
     clearTimeout(debounceTimeoutFirst);
     debounceTimeoutFirst = setTimeout(async () => {
-        if (input.value.length === 0) {
+        if (new_input.length === 0) {
             resetResults();
             return;
         }
-        let newResults = await callSearch(1, input.value);
+        let newResults = await callSearch(1, new_input);
 
         setResults(newResults);
     }, 69);
 
     clearTimeout(debounceTimeoutSecond);
     debounceTimeoutSecond = setTimeout(async () => {
-        if (input.value.length === 0) {
+        if (new_input.length === 0) {
             resetResults();
             return;
         }
-        let newResults = await callSearch(5, input.value);
+        let newResults = await callSearch(5, new_input);
         setResults(newResults);
     }, 300);
 });
+
+function magicInputreplacement(input) {
+    let new_input = input;
+    if (input.startsWith("p:")) {
+        input = input.substring(2);
+        new_input = "<C:\\Users\\" + getUsername() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\ | C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\> *.lnk " + input;
+    }
+    return new_input;
+}
 
 function startLoading() {
     // add to .search-loader loading class

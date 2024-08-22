@@ -86,6 +86,10 @@ ipcMain.handle('open-command', (event, cmd) => {
     });
 });
 
+ipcMain.handle('get-username', (event) => {
+    
+});
+
 ipcMain.handle('close-window', (event) => {
     getWindow().hide();
 });

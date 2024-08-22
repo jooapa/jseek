@@ -27,12 +27,12 @@ You can search for anything, you can filter results, using following keywords:
 
 ## coming soon
 
-- **`#<>`** Search for the Recent files
+- **`#:<>`** Search for the Recent files
   - **`C:\Users\%USERNAME%\AppData\Roaming\Microsoft\Windows\Recent`** Search in Recent
 - **`eg. 1(2+4)`** Calculate math expression
   - **`eg. 1(2+4) -> [hex|bin|oct]`** Convert math expression to hex, bin, oct
   - **`[hex|bin|oct] -> [hex|bin|oct|dec]`** Convert number to hex, bin, oct, dec
-- **`,<>`** Search programs in PATH, Start Menu..
+- **`p:<>`** Search programs in PATH, Start Menu..
   - All the path where the programs exe or shortcut is located
     - **`%PATH%`** Search in PATH
     - **`C:\Users\%USERNAME%\AppData\Roaming\Microsoft\Windows\Start Menu`** Search in Start Menu
