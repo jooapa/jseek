@@ -1,3 +1,4 @@
+"""compile the thing"""
 import os, sys, shutil
 
 c_build = False

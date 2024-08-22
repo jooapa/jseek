@@ -37,5 +37,6 @@ You can search for anything, you can filter results, using following keywords:
     - **`%PATH%`** Search in PATH
     - **`C:\Users\%USERNAME%\AppData\Roaming\Microsoft\Windows\Start Menu`** Search in Start Menu
     - **`C:\ProgramData\Microsoft\Windows\Start Menu`** Search in Start Menu
+    - Everything search `<C:\Users\%USERNAME%\AppData\Roaming\Microsoft\Windows\Start Menu\ | C:\ProgramData\Microsoft\Windows\Start Menu\> *.lnk`
 
 Without adding any keyword, it will search for the best match.
