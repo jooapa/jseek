@@ -156,12 +156,10 @@ function checkForCommandResults(input) {
     let returnVal = false;
     // command >command
     let commandUsing;
-    let commandUrl;
     let inputNew = input.substring(1);
 
     if (input.startsWith(">")) {
         commandUsing = "Run command";
-        commandUrl = "Run command";
     }
 
     if (commandUsing !== undefined) {
@@ -228,8 +226,10 @@ document.getElementById("input").addEventListener("input", (event) => {
 
     updateSelectedResult();
 
-    // magic input replacement
-    let new_input = magicInputreplacement(input.value);
+    // magic input replacement (now in the c++ code)
+    // let new_input = magicInputreplacement(input.value);
+
+    let new_input = input.value;
 
     clearTimeout(debounceTimeoutFirst);
     debounceTimeoutFirst = setTimeout(async () => {
@@ -248,19 +248,10 @@ document.getElementById("input").addEventListener("input", (event) => {
             resetResults();
             return;
         }
-        let newResults = await callSearch(5, new_input);
+        let newResults = await callSearch(5, new_input);    
         setResults(newResults);
     }, 300);
 });
-
-function magicInputreplacement(input) {
-    let new_input = input;
-    if (input.startsWith("p:")) {
-        input = input.substring(2);
-        new_input = "<C:\\Users\\" + getUsername() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\ | C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\> *.lnk " + input;
-    }
-    return new_input;
-}
 
 function startLoading() {
     // add to .search-loader loading class

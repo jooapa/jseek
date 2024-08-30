@@ -18,6 +18,8 @@
 #include <shellapi.h>
 #include <gdiplus.h>
 #include <iomanip>
+#include <Lmcons.h>
+
 
 enum class Type {
     File,
@@ -96,56 +98,6 @@ std::string wstring_to_utf8(const std::wstring& wstr) {
     return converter.to_bytes(wstr);
 }
 
-void PrintWebSearch(std::wstring searchQuery, DWORD* max_results) {
-    // std::wcout << L"searchQuery: '" << searchQuery << L"'" << std::endl;
-    std::wstring searchUsing;
-    // if the search query is less than 2 characters then return
-    if (searchQuery.size() < 2) {
-        return;
-    }
-    std::wstring searchQueryStr = searchQuery.substr(2);
-
-    std::wstring searchUrl;
-    std::wstring SearchDisplay;
-    // if the first two characters are "g " then it is a google search
-    if (searchQuery[0] == L'g' && searchQuery[1] == L' ') {
-        g_isWebSearch = true;
-        searchUsing = L"Search using Google search";
-        searchUrl = L"https://www.google.com/search?q=" + searchQueryStr;
-
-    } else if (searchQuery[0] == L'y' && searchQuery[1] == L' ') {
-        y_isWebSearch = true;
-        searchUsing = L"Search using Yahoo search";
-        searchUrl = L"https://search.yahoo.com/search?p=" + searchQueryStr;
-    } else if (searchQuery[0] == L'b' && searchQuery[1] == L' ') {
-        b_isWebSearch = true;
-        searchUsing = L"Search using Bing search";
-        searchUrl = L"https://www.bing.com/search?q=" + searchQueryStr;
-    } else if (searchQuery[0] == L'd' && searchQuery[1] == L' ') {
-        d_isWebSearch = true;
-        searchUsing = L"Search using DuckDuckGo search";
-        searchUrl = L"https://duckduckgo.com/?q=" + searchQueryStr;
-    } else if (searchQuery[0] == L'w' && searchQuery[1] == L' ') {
-        w_isWebSearch = true;
-        searchUsing = L"Search using Wikipedia search";
-        searchUrl = L"https://en.wikipedia.org/wiki/" + searchQueryStr;
-    }
-    
-    if (g_isWebSearch || y_isWebSearch || b_isWebSearch || d_isWebSearch || w_isWebSearch) {
-        makeReply(
-            searchUrl,
-            searchUsing,
-            Type::Web,
-            searchQueryStr == std::wstring(L"") ? L"Type something to search.." : L"'" + searchQueryStr + L"'",
-            searchUsing
-        );
-
-        if (*max_results == 1) {
-            *max_results = 0;
-        }
-    }
-}
-
 void ContinueWithEverything(std::wstring searchQuery, DWORD* max_results) {
     Everything_SetSearchW(searchQuery.c_str());
     Everything_SetRequestFlags(EVERYTHING_REQUEST_FILE_NAME | EVERYTHING_REQUEST_PATH | EVERYTHING_REQUEST_DATE_MODIFIED);
@@ -198,6 +150,58 @@ void ContinueWithEverything(std::wstring searchQuery, DWORD* max_results) {
 
 }
 
+std::wstring GetUsername() {
+    TCHAR username[UNLEN + 1];
+    DWORD size = UNLEN + 1;
+    GetUserName((TCHAR*)username, &size);
+    return std::wstring(username);
+}
+
+bool startsWith(const std::wstring& str, const std::wstring& prefix) {
+    return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
+}
+
+std::wstring CustomSearchReplacement(std::wstring searchQuery) {
+    std::wstring delimiter = L":";
+    if (searchQuery.find(delimiter) == std::wstring::npos) {
+        return searchQuery;
+    }
+
+    std::wstring searchQueryStr = searchQuery.substr(searchQuery.find(delimiter) + 1);
+
+    if (startsWith(searchQuery, L"r:")) {
+        return 
+            L"C:\\Users\\" + 
+            GetUsername() + 
+            L"\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\ " + 
+            searchQueryStr;
+    }
+
+    if (startsWith(searchQuery, L"p:")) {
+        return 
+            L"<C:\\Users\\" + 
+            GetUsername() + 
+            L"\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\> | C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\ *.lnk " + 
+            searchQueryStr;
+    }
+
+    if (startsWith(searchQuery, L"pu:")) {
+        return 
+            L"C:\\Users\\" + 
+            GetUsername() + 
+            L"\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\ *.lnk " + 
+            searchQueryStr;
+    }
+
+    if (startsWith(searchQuery, L"pp:")) {
+        return 
+            L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\ *.lnk " + 
+            searchQueryStr;
+    }
+
+    return searchQuery;
+}
+
 int main(int argc, char** argv) {
     if (argc < 3) {
         std::cerr << "Usage: jseek [maxResults] [searchQuery...]\n";
@@ -216,11 +220,11 @@ int main(int argc, char** argv) {
 
     std::wstring searchQuery = tmp_searchQuery;
 
-    // if the search query is less than 2 characters then return
-    // if (searchQuery.size() < 2) {
-    //     return 0;
-    // }
+    std::wstring replacedSearchQuery = CustomSearchReplacement(searchQuery);
 
-    ContinueWithEverything(searchQuery, &max_results);
+    // std::cout << "replacedSearchQuery: " << wstring_to_utf8(replacedSearchQuery) << std::endl;
+    // return 0;
+
+    ContinueWithEverything(replacedSearchQuery, &max_results);
     return 0;
 }
