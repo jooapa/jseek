@@ -1,6 +1,6 @@
 const os = require('os'); // Import the os module
 
-const debug = true;
+const debug = false
 
 /// intesity: means how much the macro should be used in the search query, meaning how much it will lag the search
 const Keywords = [

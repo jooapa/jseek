@@ -6,6 +6,8 @@ const {
     ipcMain,
 } = require('electron');
 
+const path = require('path');
+
 let mainWindow;
 
 function getWindow() {
@@ -38,7 +40,8 @@ function createWindow() {
         }
 });
 
-    mainWindow.loadFile('app/app.html');
+    console.log('Loading HTML from:', path.join(__dirname, 'app/app.html'));
+    mainWindow.loadFile(path.join(__dirname, 'app/app.html'));
 
     // Hide window on click outside
     mainWindow.on('blur', () => {

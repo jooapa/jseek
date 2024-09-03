@@ -1,14 +1,16 @@
 const { spawn } = require('child_process');
 const { debug } = require('./config');
+const path = require('path');
 
 let currentJseekProcess = null;
 
 function search(query) {
     let command;
     if (debug) {
-        command = 'backend\\build\\jseek.exe ' + query;
+        command = 'backend/build/jseek.exe ' + query;
     } else {
-        command = 'jseek ' + query;
+        command = path.join(__dirname, "..", "..", 'backend', 'jseek.exe') + ' ' + query;
+        console.log(command);
     }
 
     // Kill existing jseek process if running

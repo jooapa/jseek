@@ -62,19 +62,24 @@ if __name__ == "__main__":
         os.system("npm run pray")
             
     if build:
+        # debug mode off for now
+        with open("src/config.js", "r") as f:
+            lines = f.readlines()
+        with open("src/config.js", "w") as f:
+            for line in lines:
+                if "debug" in line and "=" in line:
+                    f.write("const debug = false\n")
+                else:
+                    f.write(line)
+                    
         os.system("npm run build")
-
-        # Copy backend/build directory
-        backend_build_src = "backend/build"
-        backend_build_dst = "dist/win-unpacked/resources/build"
-        if os.path.exists(backend_build_dst):
-            shutil.rmtree(backend_build_dst)
-        shutil.copytree(backend_build_src, backend_build_dst)
-
-        # Copy src/app directory
-        src_app_src = "src/app"
-        src_app_dst = "dist/win-unpacked/resources/app"
-        if os.path.exists(src_app_dst):
-            shutil.rmtree(src_app_dst)
-        shutil.copytree(src_app_src, src_app_dst)
-    
+            
+        # debug mode on for now
+        with open("src/config.js", "r") as f:
+            lines = f.readlines()
+        with open("src/config.js", "w") as f:
+            for line in lines:
+                if "debug" in line and "=" in line:
+                    f.write("const debug = true\n")
+                else:
+                    f.write(line)

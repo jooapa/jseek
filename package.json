@@ -15,14 +15,25 @@
       "ps-tree": "^1.2.0"
     },
     "build": {
-      "appId": "com.jooapa.jseek",
-      "files": [
-        "src/*",
-        "backend/build/**/*",
-        "package.json"
-      ],
-      "directories": {
-        "output": "dist"
-      }
+        "appId": "com.jooapa.jseek",
+        "files": [
+            "src/**/*",
+            "backend/build/jseek.exe",
+            "backend/build/Everything64.dll",
+            "package.json"
+        ],
+        "extraFiles": [
+            {
+              "from": "backend/build/Everything64.dll",
+              "to": "resources/backend/Everything64.dll"
+            },
+            {
+              "from": "backend/build/jseek.exe",
+              "to": "resources/backend/jseek.exe"
+            }
+          ],
+        "directories": {
+            "output": "dist"
+        }
     }
-  }
+}
