@@ -3,6 +3,8 @@ import os, sys, shutil
 
 c_build = False
 run_electron = False
+build = False
+
 
 if __name__ == "__main__":
     # get the args
@@ -16,6 +18,7 @@ if __name__ == "__main__":
                 options:
                     -c: gcc compile
                     -js: run electron app
+                    -build: build the electron app
             ''')
         sys.exit(1)
         
@@ -25,6 +28,8 @@ if __name__ == "__main__":
             c_build = True
         if arg == '-js':
             run_electron = True
+        if arg == '-build':
+            build = True
     
     if c_build:
         # change dir
@@ -51,10 +56,25 @@ if __name__ == "__main__":
             if os.path.exists("build/jseek"):
                 os.remove("build/jseek")
             shutil.move("jseek", "build/jseek")
-    
+
     # check if the electron app is needed
     if run_electron:
         os.system("npm run pray")
             
-    
+    if build:
+        os.system("npm run build")
+
+        # Copy backend/build directory
+        backend_build_src = "backend/build"
+        backend_build_dst = "dist/win-unpacked/resources/build"
+        if os.path.exists(backend_build_dst):
+            shutil.rmtree(backend_build_dst)
+        shutil.copytree(backend_build_src, backend_build_dst)
+
+        # Copy src/app directory
+        src_app_src = "src/app"
+        src_app_dst = "dist/win-unpacked/resources/app"
+        if os.path.exists(src_app_dst):
+            shutil.rmtree(src_app_dst)
+        shutil.copytree(src_app_src, src_app_dst)
     

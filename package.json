@@ -1,15 +1,28 @@
 {
-  "name": "jseek",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "pray": "electron src/index.js"
-  },
-  "keywords": [],
-  "author": "Jooapa",
-  "devDependencies": {
-    "electron": "^31.3.0",
-    "ps-tree": "^1.2.0"
+    "name": "jseek",
+    "version": "1.0.0",
+    "description": "search",
+    "main": "src/index.js",
+    "scripts": {
+      "pray": "electron src/index.js",
+      "build": "electron-builder"
+    },
+    "keywords": [],
+    "author": "Jooapa",
+    "devDependencies": {
+      "electron": "^31.3.0",
+      "electron-builder": "^25.0.5",
+      "ps-tree": "^1.2.0"
+    },
+    "build": {
+      "appId": "com.jooapa.jseek",
+      "files": [
+        "src/*",
+        "backend/build/**/*",
+        "package.json"
+      ],
+      "directories": {
+        "output": "dist"
+      }
+    }
   }
-}
