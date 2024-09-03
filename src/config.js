@@ -61,7 +61,7 @@ const Keywords = [
         ["startSpaceMatters", true],
     ],
     [
-        ['#:'],
+        ['r:'],
         ['Search for the Recent files'],
         ["intensity", -1],
         ["start", true],
@@ -69,6 +69,18 @@ const Keywords = [
     [
         ['p:'],
         ['Search for the programs'],
+        ["intensity", -1],
+        ["start", false],
+    ],
+    [
+        ['pu:'],
+        ['Search for the programs in User'],
+        ["intensity", -1],
+        ["start", false],
+    ],
+    [
+        ['pp:'],
+        ['Search for the programs in ProgramData'],
         ["intensity", -1],
         ["start", false],
     ],

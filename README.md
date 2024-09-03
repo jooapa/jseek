@@ -24,19 +24,19 @@ You can search for anything, you can filter results, using following keywords:
   - **`w <>`** Search for web using Wikipedia
 - **`><>`** Run command
   - **`><>!`** Run command in elevated mode _**not implemented yet**_
+- **`p:<>`** Search programs in PATH, Start Menu..
+  - All the paths where the programs exe or shortcut is located
+    - **`env:<>`****`%PATH%`** Search in PATH
+    - **`pu:<>`****`C:\Users\%USERNAME%\AppData\Roaming\Microsoft\Windows\Start Menu`** Search in Start Menu
+    - **`ps:<>`****`C:\ProgramData\Microsoft\Windows\Start Menu`** Search in Start Menu
+    - _Everything search `<C:\Users\%USERNAME%\AppData\Roaming\Microsoft\Windows\Start Menu\> | C:\ProgramData\Microsoft\Windows\Start Menu\ *.lnk`_
+- **`r:<>`** Search for the Recent files
+  - **`C:\Users\%USERNAME%\AppData\Roaming\Microsoft\Windows\Recent`** Search in Recent
 
 ## coming soon
 
-- **`#:<>`** Search for the Recent files
-  - **`C:\Users\%USERNAME%\AppData\Roaming\Microsoft\Windows\Recent`** Search in Recent
 - **`eg. 1(2+4)`** Calculate math expression
   - **`eg. 1(2+4) -> [hex|bin|oct]`** Convert math expression to hex, bin, oct
   - **`[hex|bin|oct] -> [hex|bin|oct|dec]`** Convert number to hex, bin, oct, dec
-- **`p:<>`** Search programs in PATH, Start Menu..
-  - All the path where the programs exe or shortcut is located
-    - **`%PATH%`** Search in PATH
-    - **`C:\Users\%USERNAME%\AppData\Roaming\Microsoft\Windows\Start Menu`** Search in Start Menu
-    - **`C:\ProgramData\Microsoft\Windows\Start Menu`** Search in Start Menu
-    - Everything search `<C:\Users\%USERNAME%\AppData\Roaming\Microsoft\Windows\Start Menu\ | C:\ProgramData\Microsoft\Windows\Start Menu\> *.lnk`
 
 Without adding any keyword, it will search for the best match.

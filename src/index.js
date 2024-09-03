@@ -67,7 +67,7 @@ ipcMain.handle('open-command', (event, cmd) => {
     const [command, ...args] = cmd.split(' ');
 
     // Construct the full command with arguments
-    const fullCommand = `start cmd.exe /K "${command} ${args.join(' ')}"`;
+    const fullCommand = `${command} ${args.join(' ')}`;
 
     // Execute the command in a new terminal window
     const child = spawn(fullCommand, { shell: true });
